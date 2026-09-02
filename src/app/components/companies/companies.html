@@ -11,13 +11,20 @@
 
     <div class="flex flex-wrap justify-center gap-8">
       <div *ngFor="let company of i18n.t().companies.items" class="group p-8 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#3B82F6] dark:hover:border-[#3B82F6] hover:shadow-lg dark:hover:shadow-none transition-all duration-300 bg-gradient-to-br from-gray-50 to-white dark:from-dark dark:to-dark-secondary w-full md:w-80">
-        <div class="mb-6 h-24 flex items-center justify-center bg-white dark:bg-dark rounded-lg p-4 group-hover:scale-105 transition-transform duration-300">
-          <img
-            *ngIf="company.logo"
-            [src]="company.logo"
-            [alt]="company.name"
-            class="max-h-20 max-w-full object-contain"
-          >
+        <div class="mb-6 h-24 flex items-center justify-center gap-3 bg-white dark:bg-dark rounded-lg p-4 group-hover:scale-105 transition-transform duration-300">
+          <ng-container *ngIf="company.logo">
+            <img
+              [src]="company.logo"
+              [alt]="company.name"
+              class="max-h-16 max-w-[42%] object-contain"
+            >
+            <img
+              *ngIf="company.logoExtra"
+              [src]="company.logoExtra"
+              alt=""
+              class="max-h-10 max-w-[48%] object-contain object-left"
+            >
+          </ng-container>
           <span
             *ngIf="!company.logo"
             class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white"

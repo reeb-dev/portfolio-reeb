@@ -3,6 +3,7 @@ export type Lang = 'es' | 'en';
 export interface CompanyCopy {
   name: string;
   logo?: string;
+  logoExtra?: string;
   initials: string;
   role: string;
   years: string;
@@ -119,7 +120,13 @@ export interface Dictionary {
 }
 
 const companiesMeta = {
-  bp4: { name: 'BP4', initials: 'BP4', current: true as const },
+  bp4: {
+    name: 'BP4 · Fiserv',
+    logo: 'bp4.png',
+    logoExtra: 'fiserv.svg',
+    initials: 'BP4',
+    current: true as const,
+  },
   indra: { name: 'Indra', logo: 'screenshot-2025-02-05-130401.png', initials: 'IN' },
   siskit: { name: 'Siskit', logo: 'unnamed.webp', initials: 'SK' },
 };

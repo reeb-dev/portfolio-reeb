@@ -42,7 +42,13 @@
 
         <div class="flex flex-wrap gap-2">
           <span class="text-xs font-mono text-[#94A3B8] mr-2">{{ i18n.t().projects.stack }}</span>
-          <span *ngFor="let tech of project.tech" class="px-3 py-1 bg-gray-100 dark:bg-[#1E293B] text-[#94A3B8] text-sm rounded-full font-medium">
+          <span *ngFor="let tech of project.tech" class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-[#1E293B] text-[#94A3B8] text-sm rounded-full font-medium">
+            <img
+              *ngIf="logoFor(tech)"
+              [src]="logoFor(tech)"
+              alt=""
+              class="h-3.5 w-3.5 shrink-0 object-contain"
+            >
             {{ tech }}
           </span>
         </div>
