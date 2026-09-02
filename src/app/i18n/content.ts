@@ -4,6 +4,7 @@ export interface CompanyCopy {
   name: string;
   logo?: string;
   logoExtra?: string;
+  logoWell?: 'neutral' | 'indra' | 'siskit';
   initials: string;
   role: string;
   years: string;
@@ -144,8 +145,13 @@ const companiesMeta = {
     initials: 'BP4',
     current: true as const,
   },
-  indra: { name: 'Indra', logo: 'screenshot-2025-02-05-130401.png', initials: 'IN' },
-  siskit: { name: 'Siskit', logo: 'unnamed.webp', initials: 'SK' },
+  indra: {
+    name: 'Indra',
+    logo: 'screenshot-2025-02-05-130401.png',
+    initials: 'IN',
+    logoWell: 'indra' as const,
+  },
+  siskit: { name: 'Siskit', logo: 'siskit.png', initials: 'SK', logoWell: 'siskit' as const },
 };
 
 export const translations: Record<Lang, Dictionary> = {
@@ -168,7 +174,7 @@ export const translations: Record<Lang, Dictionary> = {
       kicker: 'Manuel Reeb · Senior Software Engineer',
       title: 'Android, Angular y Java/Spring.',
       subtitle: 'Programo desde 2017. Hoy en BP4. Antes Indra y Siskit.',
-      body: 'Apps Android nativas (Kotlin/Java), interfaces en Angular y APIs Java/Spring Boot. Código mantenible y cambios seguros sobre sistemas que ya están en producción. Abierto a freelance de alcance cerrado.',
+      body: 'Android nativo (Kotlin/Java), Angular y Java/Spring. Código mantenible en producción. Freelance de alcance cerrado.',
       ctaExperience: 'Ver experiencia',
       ctaContact: 'Escribime',
     },
@@ -183,7 +189,7 @@ export const translations: Record<Lang, Dictionary> = {
           role: 'Software Engineer',
           years: 'Ene 2026 – actualidad',
           description:
-            'Apps a medida para clientes: Android nativo, Angular y APIs Java/Spring Boot. Flujos de negocio (horas, roles, reportes), code review y entregas incrementales.',
+            'Apps a medida para clientes: Android nativo, Angular y backend Java. En Fiserv: mantenimiento de código legacy y pruebas SMTP por terminal en entornos de desarrollo y producción, sobre un sistema con muchos usuarios. Code review y entregas incrementales.',
         },
         {
           ...companiesMeta.indra,
@@ -340,7 +346,7 @@ export const translations: Record<Lang, Dictionary> = {
       title: 'Sobre',
       p1Before: 'Ingeniero de software desde 2017. Consultoría y producto desde 2018: ',
       p1Highlight: 'más de 8 años en Android nativo, Angular y Java/Spring Boot',
-      p2: 'En Siskit armé sistemas web y móviles de punta a punta. En Indra (2022–2025) evolucioné aplicaciones en producción — web y móvil — con foco en cambios seguros, pruebas y pases a entornos. Desde enero 2026 estoy en BP4: apps a medida para clientes, flujos de negocio, code review y entregas incrementales.',
+      p2: 'En Siskit armé sistemas web y móviles de punta a punta. En Indra (2022–2025) evolucioné aplicaciones en producción — web y móvil — con foco en cambios seguros, pruebas y pases a entornos. Desde enero 2026 estoy en BP4 (Fiserv): apps a medida, mantenimiento de código legacy, backend Java, code review y entregas incrementales.',
       p3: 'es mi marca personal: el mismo criterio, para un trabajo freelance acotado o una consulta.',
       focusLabel: 'Enfoque actual',
       focusValue: 'Android (Kotlin/Java) · Angular · Java/Spring Boot',
@@ -468,7 +474,7 @@ export const translations: Record<Lang, Dictionary> = {
       kicker: 'Manuel Reeb · Senior Software Engineer',
       title: 'Android, Angular, and Java/Spring.',
       subtitle: 'Coding since 2017. Currently at BP4. Previously Indra and Siskit.',
-      body: 'Native Android apps (Kotlin/Java), Angular UIs, and Java/Spring Boot APIs. Maintainable code and safe changes on systems already in production. Open for closed-scope freelance.',
+      body: 'Native Android (Kotlin/Java), Angular, and Java/Spring. Maintainable production code. Closed-scope freelance.',
       ctaExperience: 'View experience',
       ctaContact: 'Get in touch',
     },
@@ -483,7 +489,7 @@ export const translations: Record<Lang, Dictionary> = {
           role: 'Software Engineer',
           years: 'Jan 2026 – present',
           description:
-            'Custom client apps: native Android, Angular, and Java/Spring Boot APIs. Business flows (time tracking, roles, reports), code review, and incremental delivery.',
+            'Custom client apps: native Android, Angular, and Java backends. At Fiserv: legacy code maintenance and SMTP tests from the terminal in development and production environments, on a system with a high volume of users. Code review and incremental delivery.',
         },
         {
           ...companiesMeta.indra,
@@ -637,7 +643,7 @@ export const translations: Record<Lang, Dictionary> = {
       title: 'About',
       p1Before: 'Software engineer since 2017. Consulting and product work since 2018: ',
       p1Highlight: '8+ years on native Android, Angular, and Java/Spring Boot',
-      p2: 'At Siskit I built web and mobile systems end to end. At Indra (2022–2025) I evolved production apps — web and mobile — with a focus on safe changes, tests, and environment promotions. Since January 2026 I have been at BP4: custom client apps, business flows, code review, and incremental delivery.',
+      p2: 'At Siskit I built web and mobile systems end to end. At Indra (2022–2025) I evolved production apps — web and mobile — with a focus on safe changes, tests, and environment promotions. Since January 2026 I have been at BP4 (Fiserv): custom apps, legacy maintenance, Java backends, code review, and incremental delivery.',
       p3: 'is my personal brand: the same standard, for a scoped freelance slice or a conversation.',
       focusLabel: 'Focus',
       focusValue: 'Android (Kotlin/Java) · Angular · Java/Spring Boot',
