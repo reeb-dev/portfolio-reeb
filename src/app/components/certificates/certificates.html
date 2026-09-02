@@ -1,0 +1,40 @@
+<section id="certificados" class="py-24 bg-gray-50 dark:bg-[#020617] transition-colors duration-300">
+  <div class="container-custom">
+    <div class="max-w-2xl mx-auto text-center mb-16">
+      <h2 class="heading-lg mb-4 text-gray-900 dark:text-white">{{ i18n.t().certificates.title }}</h2>
+      <p class="text-lg text-[#94A3B8]">
+        {{ i18n.t().certificates.subtitle }}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <a
+        *ngFor="let cert of i18n.t().certificates.items"
+        [href]="cert.url"
+        target="_blank"
+        rel="noopener"
+        class="group flex flex-col p-6 rounded-xl border border-[#E5E7EB] dark:border-[#1E293B] hover:border-[#3B82F6] dark:hover:border-[#3B82F6] transition-all duration-200 bg-white dark:bg-[#0A0A0B]"
+      >
+        <div class="flex items-center justify-between gap-2 mb-4">
+          <span class="text-xs font-semibold uppercase tracking-wide text-[#475569] dark:text-[#94A3B8]">
+            {{ i18n.t().certificates.issuer }}
+          </span>
+          <span class="text-xs font-mono text-[#3B82F6] bg-[#3B82F6]/10 px-2 py-1 rounded">
+            {{ cert.level }}
+          </span>
+        </div>
+
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-[#3B82F6] transition-colors">
+          {{ cert.name }}
+        </h3>
+        <p *ngIf="cert.issued" class="text-sm font-semibold text-[#3B82F6] mb-3">{{ cert.issued }}</p>
+        <p class="text-sm text-[#475569] dark:text-[#94A3B8] leading-relaxed flex-1">
+          {{ cert.summary }}
+        </p>
+        <span class="mt-6 pt-4 border-t border-gray-200 dark:border-[#1E293B] text-sm font-medium text-[#3B82F6]">
+          {{ i18n.t().certificates.verify }} →
+        </span>
+      </a>
+    </div>
+  </div>
+</section>

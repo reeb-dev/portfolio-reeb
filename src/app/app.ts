@@ -4,6 +4,7 @@ import { HeroComponent } from './components/hero/hero';
 import { CompaniesComponent } from './components/companies/companies';
 import { ProjectsComponent } from './components/projects/projects';
 import { StackComponent } from './components/stack/stack';
+import { CertificatesComponent } from './components/certificates/certificates';
 import { AboutComponent } from './components/about/about';
 import { ServicesComponent } from './components/services/services';
 import { ContactComponent } from './components/contact/contact';
@@ -18,6 +19,7 @@ import { I18nService } from './services/i18n';
     CompaniesComponent,
     ProjectsComponent,
     StackComponent,
+    CertificatesComponent,
     AboutComponent,
     ServicesComponent,
     ContactComponent,

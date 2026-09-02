@@ -23,6 +23,14 @@ export interface ProjectCopy {
   url?: string;
 }
 
+export interface CertificateCopy {
+  name: string;
+  level: string;
+  issued: string;
+  summary: string;
+  url: string;
+}
+
 export interface ServiceCopy {
   title: string;
   problem: string;
@@ -36,6 +44,7 @@ export interface Dictionary {
   nav: {
     experience: string;
     stack: string;
+    certificates: string;
     about: string;
     services: string;
     themeLight: string;
@@ -68,6 +77,13 @@ export interface Dictionary {
     title: string;
     subtitle: string;
     categories: { name: string; icon: string; technologies: string[] }[];
+  };
+  certificates: {
+    title: string;
+    subtitle: string;
+    issuer: string;
+    verify: string;
+    items: CertificateCopy[];
   };
   about: {
     title: string;
@@ -141,6 +157,7 @@ export const translations: Record<Lang, Dictionary> = {
     nav: {
       experience: 'Experiencia',
       stack: 'Stack',
+      certificates: 'Certificados',
       about: 'Sobre mí',
       services: 'Servicios',
       themeLight: 'Cambiar a modo claro',
@@ -280,6 +297,43 @@ export const translations: Record<Lang, Dictionary> = {
         },
       ],
     },
+    certificates: {
+      title: 'Certificados',
+      subtitle:
+        'Certificaciones oficiales de HackerRank, las mismas que figuran en LinkedIn. Cada enlace abre el certificado verificado.',
+      issuer: 'HackerRank',
+      verify: 'Ver certificado',
+      items: [
+        {
+          name: 'Software Engineer Intern',
+          level: 'Role',
+          issued: 'May 2024',
+          summary: 'Certificación de rol. Cubre problem solving y SQL.',
+          url: 'https://www.hackerrank.com/certificates/3e819e06a360',
+        },
+        {
+          name: 'Angular (Intermediate)',
+          level: 'Intermediate',
+          issued: 'Dic 2023',
+          summary: 'Routing, NgModules, Observables, inyección de dependencias y APIs.',
+          url: 'https://www.hackerrank.com/certificates/02f1c21ba380',
+        },
+        {
+          name: 'JavaScript (Intermediate)',
+          level: 'Intermediate',
+          issued: '',
+          summary: 'Patrones de diseño, memoria, modelo de concurrencia y event loop.',
+          url: 'https://www.hackerrank.com/certificates/48b6143dab24',
+        },
+        {
+          name: 'Rest API (Intermediate)',
+          level: 'Intermediate',
+          issued: 'Mar 2023',
+          summary: 'Obtener datos de una API y procesarlos con parámetros o paginado.',
+          url: 'https://www.hackerrank.com/certificates/6e5f9b2226e7',
+        },
+      ],
+    },
     about: {
       title: 'Sobre',
       p1Before: 'Ingeniero de software desde 2017. Consultoría y producto desde 2018: ',
@@ -402,6 +456,7 @@ export const translations: Record<Lang, Dictionary> = {
     nav: {
       experience: 'Experience',
       stack: 'Stack',
+      certificates: 'Certificates',
       about: 'About',
       services: 'Services',
       themeLight: 'Switch to light mode',
@@ -535,6 +590,43 @@ export const translations: Record<Lang, Dictionary> = {
           name: 'Quality & infra',
           icon: '🛠️',
           technologies: ['JUnit', 'Mockito', 'Karma / Jasmine', 'Git', 'Docker', 'CI/CD', 'Scrum'],
+        },
+      ],
+    },
+    certificates: {
+      title: 'Certificates',
+      subtitle:
+        'Official HackerRank certifications, the same ones listed on LinkedIn. Each link opens the verified certificate.',
+      issuer: 'HackerRank',
+      verify: 'View certificate',
+      items: [
+        {
+          name: 'Software Engineer Intern',
+          level: 'Role',
+          issued: 'May 2024',
+          summary: 'Role certification covering problem solving and SQL.',
+          url: 'https://www.hackerrank.com/certificates/3e819e06a360',
+        },
+        {
+          name: 'Angular (Intermediate)',
+          level: 'Intermediate',
+          issued: 'Dec 2023',
+          summary: 'Routing, NgModules, Observables, dependency injection, and APIs.',
+          url: 'https://www.hackerrank.com/certificates/02f1c21ba380',
+        },
+        {
+          name: 'JavaScript (Intermediate)',
+          level: 'Intermediate',
+          issued: '',
+          summary: 'Design patterns, memory management, concurrency model, and the event loop.',
+          url: 'https://www.hackerrank.com/certificates/48b6143dab24',
+        },
+        {
+          name: 'Rest API (Intermediate)',
+          level: 'Intermediate',
+          issued: 'Mar 2023',
+          summary: 'Fetching API data and processing it with parameters or paging.',
+          url: 'https://www.hackerrank.com/certificates/6e5f9b2226e7',
         },
       ],
     },
