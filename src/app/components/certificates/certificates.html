@@ -27,6 +27,9 @@
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-[#3B82F6] transition-colors">
           {{ cert.name }}
         </h3>
+        <p *ngIf="cert.note" class="text-xs text-[#64748B] dark:text-[#94A3B8] mb-2 leading-relaxed">
+          {{ cert.note }}
+        </p>
         <p *ngIf="cert.issued" class="text-sm font-semibold text-[#3B82F6] mb-3">{{ cert.issued }}</p>
         <p class="text-sm text-[#475569] dark:text-[#94A3B8] leading-relaxed flex-1">
           {{ cert.summary }}

@@ -29,6 +29,7 @@ export interface CertificateCopy {
   issued: string;
   summary: string;
   url: string;
+  note?: string;
 }
 
 export interface ServiceCopy {
@@ -150,7 +151,7 @@ const companiesMeta = {
 export const translations: Record<Lang, Dictionary> = {
   es: {
     meta: {
-      title: 'Manuel Reeb | Senior Software Engineer — Android · Java/Spring · Angular',
+      title: 'Manuel Reeb · Senior Software Engineer — Android · Angular · Java/Spring',
       description:
         'Senior Software Engineer en BP4. Android nativo (Kotlin/Java), Angular y Java/Spring Boot. Freelance acotado. Antes Indra y Siskit.',
     },
@@ -277,22 +278,22 @@ export const translations: Record<Lang, Dictionary> = {
       categories: [
         {
           name: 'Mobile',
-          icon: '📱',
+          icon: 'tech/android.svg',
           technologies: ['Android nativo', 'Kotlin', 'Java', 'Jetpack Compose', 'MVVM / MVP', 'Material Design'],
         },
         {
           name: 'Frontend',
-          icon: '🎨',
+          icon: 'tech/angular.svg',
           technologies: ['Angular', 'TypeScript', 'JavaScript', 'RxJS', 'Tailwind CSS', 'Ionic'],
         },
         {
           name: 'Backend',
-          icon: '⚙️',
+          icon: 'tech/springboot.svg',
           technologies: ['Java', 'Spring Boot', 'APIs REST', 'JWT', 'Node.js', 'Laravel', 'PostgreSQL', 'Oracle'],
         },
         {
           name: 'Calidad e infra',
-          icon: '🛠️',
+          icon: 'tech/docker.svg',
           technologies: ['JUnit', 'Mockito', 'Karma / Jasmine', 'Git', 'Docker', 'CI/CD', 'Scrum'],
         },
       ],
@@ -308,8 +309,9 @@ export const translations: Record<Lang, Dictionary> = {
           name: 'Software Engineer Intern',
           level: 'Role',
           issued: 'May 2024',
-          summary: 'Certificación de rol. Cubre problem solving y SQL.',
+          summary: 'Examen HackerRank. Cubre problem solving y SQL.',
           url: 'https://www.hackerrank.com/certificates/3e819e06a360',
+          note: 'Certificación HackerRank (no es un rol laboral)',
         },
         {
           name: 'Angular (Intermediate)',
@@ -449,7 +451,7 @@ export const translations: Record<Lang, Dictionary> = {
   },
   en: {
     meta: {
-      title: 'Manuel Reeb | Senior Software Engineer — Android · Java/Spring · Angular',
+      title: 'Manuel Reeb · Senior Software Engineer — Android · Angular · Java/Spring',
       description:
         'Senior Software Engineer at BP4. Native Android (Kotlin/Java), Angular, and Java/Spring Boot. Open for scoped freelance. Previously Indra and Siskit.',
     },
@@ -573,22 +575,22 @@ export const translations: Record<Lang, Dictionary> = {
       categories: [
         {
           name: 'Mobile',
-          icon: '📱',
+          icon: 'tech/android.svg',
           technologies: ['Native Android', 'Kotlin', 'Java', 'Jetpack Compose', 'MVVM / MVP', 'Material Design'],
         },
         {
           name: 'Frontend',
-          icon: '🎨',
+          icon: 'tech/angular.svg',
           technologies: ['Angular', 'TypeScript', 'JavaScript', 'RxJS', 'Tailwind CSS', 'Ionic'],
         },
         {
           name: 'Backend',
-          icon: '⚙️',
+          icon: 'tech/springboot.svg',
           technologies: ['Java', 'Spring Boot', 'REST APIs', 'JWT', 'Node.js', 'Laravel', 'PostgreSQL', 'Oracle'],
         },
         {
           name: 'Quality & infra',
-          icon: '🛠️',
+          icon: 'tech/docker.svg',
           technologies: ['JUnit', 'Mockito', 'Karma / Jasmine', 'Git', 'Docker', 'CI/CD', 'Scrum'],
         },
       ],
@@ -604,8 +606,9 @@ export const translations: Record<Lang, Dictionary> = {
           name: 'Software Engineer Intern',
           level: 'Role',
           issued: 'May 2024',
-          summary: 'Role certification covering problem solving and SQL.',
+          summary: 'HackerRank exam covering problem solving and SQL.',
           url: 'https://www.hackerrank.com/certificates/3e819e06a360',
+          note: 'HackerRank certification (not a job title)',
         },
         {
           name: 'Angular (Intermediate)',
