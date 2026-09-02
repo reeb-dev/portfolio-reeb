@@ -2,32 +2,31 @@
   <div class="container-custom">
     <div class="max-w-3xl">
       <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 tracking-tight flex items-baseline gap-3">
-        <span>Sobre</span>
+        <span>{{ i18n.t().about.title }}</span>
         <span class="font-brand font-semibold text-4xl tracking-wider" style="letter-spacing: 0.04em;"><span class="text-gray-900 dark:text-white">REEB</span><span class="text-[#3B82F6]">.</span></span>
       </h2>
 
       <div class="space-y-6 text-[#94A3B8] text-lg leading-relaxed font-light">
         <p>
-          Llevo 8 años desarrollando software con un enfoque práctico: <span class="text-gray-900 dark:text-white font-medium">solucionar problemas técnicos sin añadir complejidad innecesaria</span>.
-        </p>
-        
-        <p>
-          Mi perfil se formó principalmente durante <span class="text-gray-900 dark:text-white font-medium">4 años como Software Engineer en Indra</span>, donde me encargué del soporte y la estabilidad de sistemas críticos. Esa experiencia me enseñó que el código debe ser, ante todo, una herramienta que no genere problemas a futuro.
+          {{ i18n.t().about.p1Before }}<span class="text-gray-900 dark:text-white font-medium">{{ i18n.t().about.p1Highlight }}</span>.
         </p>
 
+        <p>{{ i18n.t().about.p2 }}</p>
+
         <p>
-          Lanzo <span class="font-brand font-semibold tracking-wider"><span class="text-gray-900 dark:text-white">REEB</span><span class="text-[#3B82F6]">.</span></span> este 2026 para trabajar de forma independiente, aportando estándares de nivel enterprise a proyectos que buscan durabilidad.
+          <span class="font-brand font-semibold tracking-wider"><span class="text-gray-900 dark:text-white">REEB</span><span class="text-[#3B82F6]">.</span></span>
+          {{ i18n.t().about.p3 }}
         </p>
       </div>
 
       <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-[#E5E7EB] dark:border-[#1E293B] pt-8">
         <div>
-          <span class="block text-xs font-mono text-[#3B82F6] uppercase tracking-widest mb-2">Enfoque actual</span>
-          <p class="text-sm text-[#94A3B8]">Arquitecturas mantenibles, Angular y ecosistemas Java/Spring.</p>
+          <span class="block text-xs font-mono text-[#3B82F6] uppercase tracking-widest mb-2">{{ i18n.t().about.focusLabel }}</span>
+          <p class="text-sm text-[#94A3B8]">{{ i18n.t().about.focusValue }}</p>
         </div>
         <div>
-          <span class="block text-xs font-mono text-[#3B82F6] uppercase tracking-widest mb-2">Disponibilidad</span>
-          <p class="text-sm text-[#94A3B8]">Proyectos freelance y posiciones de Staff / Senior Engineer.</p>
+          <span class="block text-xs font-mono text-[#3B82F6] uppercase tracking-widest mb-2">{{ i18n.t().about.todayLabel }}</span>
+          <p class="text-sm text-[#94A3B8]">{{ i18n.t().about.todayValue }}</p>
         </div>
       </div>
     </div>

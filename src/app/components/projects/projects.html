@@ -1,19 +1,20 @@
 <section id="projects" class="py-24 bg-gray-50 dark:bg-[#020617] transition-colors duration-300">
   <div class="container-custom">
     <div class="max-w-2xl mx-auto text-center mb-16">
-      <h2 class="heading-lg mb-4 text-gray-900 dark:text-white">Experiencia Técnica</h2>
+      <h2 class="heading-lg mb-4 text-gray-900 dark:text-white">{{ i18n.t().projects.title }}</h2>
       <p class="text-lg text-[#94A3B8]">
-        En lugar de "logros increíbles", aquí muestro lo que he resuelto en entornos reales.
+        {{ i18n.t().projects.subtitle }}
       </p>
     </div>
 
     <div class="space-y-8">
-      <div *ngFor="let project of projects" class="bg-white dark:bg-[#0A0A0B] rounded-xl border border-[#E5E7EB] dark:border-[#1E293B] p-8 hover:border-[#3B82F6] dark:hover:border-[#3B82F6] transition-all duration-300">
-        
-        <!-- Header -->
+      <div *ngFor="let project of i18n.t().projects.items" class="bg-white dark:bg-[#0A0A0B] rounded-xl border border-[#E5E7EB] dark:border-[#1E293B] p-8 hover:border-[#3B82F6] dark:hover:border-[#3B82F6] transition-all duration-300">
         <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
           <div>
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{{ project.title }}</h3>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <a *ngIf="project.url" [href]="project.url" target="_blank" rel="noopener" class="hover:text-[#3B82F6] transition-colors">{{ project.title }}</a>
+              <span *ngIf="!project.url">{{ project.title }}</span>
+            </h3>
             <div class="flex flex-wrap gap-2">
               <span class="text-xs font-mono text-[#94A3B8] bg-gray-100 dark:bg-[#1E293B] px-2 py-1 rounded">{{ project.environment }}</span>
               <span class="text-xs font-mono text-[#3B82F6] bg-[#3B82F6]/10 px-2 py-1 rounded">{{ project.metrics }}</span>
@@ -22,28 +23,25 @@
           <span class="text-sm font-mono text-[#3B82F6] bg-[#3B82F6]/10 px-3 py-1 rounded-full whitespace-nowrap">{{ project.role }}</span>
         </div>
 
-        <!-- Context -->
         <p class="text-[#94A3B8] mb-6">{{ project.context }}</p>
 
-        <!-- Challenge & Solution -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div class="p-4 bg-gray-50 dark:bg-[#020617] rounded-lg border border-gray-200 dark:border-[#1E293B]">
             <h4 class="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-              <span class="text-[#3B82F6]">▸</span> El reto
+              <span class="text-[#3B82F6]">▸</span> {{ i18n.t().projects.challenge }}
             </h4>
             <p class="text-sm text-[#94A3B8]">{{ project.challenge }}</p>
           </div>
           <div class="p-4 bg-gray-50 dark:bg-[#020617] rounded-lg border border-gray-200 dark:border-[#1E293B]">
             <h4 class="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-              <span class="text-[#3B82F6]">▸</span> Lo que hice
+              <span class="text-[#3B82F6]">▸</span> {{ i18n.t().projects.solution }}
             </h4>
             <p class="text-sm text-[#94A3B8]">{{ project.solution }}</p>
           </div>
         </div>
 
-        <!-- Tech Stack -->
         <div class="flex flex-wrap gap-2">
-          <span class="text-xs font-mono text-[#94A3B8] mr-2">Stack:</span>
+          <span class="text-xs font-mono text-[#94A3B8] mr-2">{{ i18n.t().projects.stack }}</span>
           <span *ngFor="let tech of project.tech" class="px-3 py-1 bg-gray-100 dark:bg-[#1E293B] text-[#94A3B8] text-sm rounded-full font-medium">
             {{ tech }}
           </span>

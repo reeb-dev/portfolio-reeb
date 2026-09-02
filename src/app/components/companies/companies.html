@@ -1,43 +1,45 @@
-<section class="section-padding bg-white dark:bg-dark-secondary border-b border-gray-200 dark:border-dark transition-colors duration-300">
+<section id="experiencia" class="section-padding bg-white dark:bg-dark-secondary border-b border-gray-200 dark:border-dark transition-colors duration-300">
   <div class="container-custom">
     <div class="max-w-2xl mx-auto text-center mb-16">
       <h2 class="heading-lg mb-4 text-gray-900 dark:text-white">
-        Empresas donde he dejado impacto
+        {{ i18n.t().companies.title }}
       </h2>
       <p class="text-lg text-text-muted">
-        Mi carrera incluye experiencias en multinacionales y startups innovadoras
+        {{ i18n.t().companies.subtitle }}
       </p>
     </div>
-    
+
     <div class="flex flex-wrap justify-center gap-8">
-      <div *ngFor="let company of companies" class="group p-8 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-#06B6D4 dark:hover:border-#0891B2 hover:shadow-lg dark:hover:shadow-none transition-all duration-300 bg-gradient-to-br from-gray-50 to-white dark:from-dark dark:to-dark-secondary w-full md:w-80">
-        <!-- Logo -->
+      <div *ngFor="let company of i18n.t().companies.items" class="group p-8 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#3B82F6] dark:hover:border-[#3B82F6] hover:shadow-lg dark:hover:shadow-none transition-all duration-300 bg-gradient-to-br from-gray-50 to-white dark:from-dark dark:to-dark-secondary w-full md:w-80">
         <div class="mb-6 h-24 flex items-center justify-center bg-white dark:bg-dark rounded-lg p-4 group-hover:scale-105 transition-transform duration-300">
-          <img 
-            [src]="company.logo" 
-            [alt]="company.name" 
+          <img
+            *ngIf="company.logo"
+            [src]="company.logo"
+            [alt]="company.name"
             class="max-h-20 max-w-full object-contain"
-            onerror="this.src='unnamed.webp'"
           >
+          <span
+            *ngIf="!company.logo"
+            class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white"
+          >{{ company.initials }}</span>
         </div>
-        
-        <!-- Content -->
+
         <div class="space-y-3">
           <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ company.name }}</h3>
-          
-          <p class="text-sm font-semibold text-#0891B2 dark:text-#22D3EE">
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ company.role }}</p>
+          <p class="text-sm font-semibold text-[#3B82F6]">
             {{ company.years }}
           </p>
-          
-          <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed" *ngIf="company.description">
+          <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
             {{ company.description }}
           </p>
         </div>
-        
-        <!-- Badge -->
+
         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <span class="inline-block px-3 py-1 bg-accent-100 dark:bg-accent-900 dark:bg-opacity-30 text-accent-700 dark:text-#22D3EE text-xs font-semibold rounded-full">
-            ✓ Experiencia
+          <span
+            class="inline-block px-3 py-1 bg-accent-100 dark:bg-accent-900 dark:bg-opacity-30 text-accent-700 dark:text-[#22D3EE] text-xs font-semibold rounded-full"
+          >
+            {{ company.current ? i18n.t().companies.current : i18n.t().companies.past }}
           </span>
         </div>
       </div>

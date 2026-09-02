@@ -8,6 +8,7 @@ import { AboutComponent } from './components/about/about';
 import { ServicesComponent } from './components/services/services';
 import { ContactComponent } from './components/contact/contact';
 import { FooterComponent } from './components/footer/footer';
+import { I18nService } from './services/i18n';
 
 @Component({
   selector: 'app-root',
@@ -20,9 +21,11 @@ import { FooterComponent } from './components/footer/footer';
     AboutComponent,
     ServicesComponent,
     ContactComponent,
-    FooterComponent
+    FooterComponent,
   ],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
-export class AppComponent {}
+export class AppComponent {
+  constructor(_i18n: I18nService) {}
+}

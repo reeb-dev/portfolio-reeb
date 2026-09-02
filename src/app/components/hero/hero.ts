@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { I18nService } from '../../services/i18n';
 
 @Component({
   selector: 'app-hero',
@@ -6,4 +7,6 @@ import { Component } from '@angular/core';
   templateUrl: './hero.html',
   styleUrl: './hero.css',
 })
-export class HeroComponent {}
+export class HeroComponent {
+  constructor(public i18n: I18nService) {}
+}

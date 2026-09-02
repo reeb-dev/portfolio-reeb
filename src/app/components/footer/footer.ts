@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { I18nService } from '../../services/i18n';
 
 @Component({
   selector: 'app-footer',
@@ -8,4 +9,6 @@ import { Component } from '@angular/core';
 })
 export class FooterComponent {
   currentYear = new Date().getFullYear();
+
+  constructor(public i18n: I18nService) {}
 }
