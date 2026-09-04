@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Casos prácticos: código legacy vs. proyecto nuevo</title>
+  <meta name="description" content="Fichas para el chat de hoy: tocar código que ya está en producción, o arrancar un repo sin mezclar stacks. No es el manual largo.">
+  <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --bg: #f1f5f9;
+      --card: #fff;
+      --accent: #1d4ed8;
+      --accent-soft: #eff6ff;
+      --code: #0f172a;
+      --code-bg: #f1f5f9;
+      --code-border: #475569;
+      --ok: #166534;
+      --ok-bg: #f0fdf4;
+      --ok-border: #15803d;
+      --warn: #9a3412;
+      --warn-bg: #fff7ed;
+      --warn-border: #c2410c;
+      --use: #1e40af;
+      --react: #075985;
+      --react-bg: #f0f9ff;
+      --react-soft: #e0f2fe;
+      --java: #92400e;
+      --java-bg: #fffbeb;
+      --java-soft: #fef3c7;
+      --model: #5b21b6;
+      --docs: #065f46;
+      --fast: #9a3412;
+      --fast-bg: #fff7ed;
+      --think: #5b21b6;
+      --think-bg: #f5f3ff;
+      --legacy: #9a3412;
+      --legacy-bg: #fff7ed;
+      --legacy-soft: #ffedd5;
+      --nuevo: #0f766e;
+      --nuevo-bg: #f0fdfa;
+      --nuevo-soft: #ccfbf1;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 1rem; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+      font-size: 17px;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+    header.hero {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    header.hero p.kicker {
+      margin: 0 0 0.5rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 0.75rem; }
+    .lede { color: var(--muted); margin: 0 0 1rem; }
+    .meta { font-size: 0.9rem; color: var(--muted); margin: 0; }
+    .hub {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.35rem 1.5rem 1.55rem;
+      margin-bottom: 1.25rem;
+    }
+    .hub-one-liner {
+      margin: 0 0 0.4rem;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .hub > h2 { font-size: 1.15rem; margin: 0 0 0.9rem; color: var(--muted); font-weight: 600; }
+    .hub-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    @media (min-width: 640px) {
+      .hub-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .hub-col {
+      border: 1px solid var(--line);
+      border-left-width: 5px;
+      border-radius: 10px;
+      padding: 0.95rem 1rem 1rem;
+      background: var(--bg);
+    }
+    .hub-col.legacy { border-left-color: var(--legacy); background: var(--legacy-bg); }
+    .hub-col.nuevo { border-left-color: var(--nuevo); background: var(--nuevo-bg); }
+    .hub-col h3 { margin: 0 0 0.35rem; font-size: 1.05rem; }
+    .hub-col.legacy h3 { color: var(--legacy); }
+    .hub-col.nuevo h3 { color: var(--nuevo); }
+    .hub-col p.lead { margin: 0 0 0.65rem; font-size: 0.88rem; color: var(--muted); }
+    .hub-col ol { margin: 0; padding-left: 1.15rem; font-size: 0.9rem; }
+    .hub-col li { margin-bottom: 0.35rem; }
+    .hub-col a { color: var(--accent); }
+    .hub-share { margin: 0.9rem 0 0; font-size: 0.85rem; color: var(--muted); }
+    section.chapter {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-left-width: 6px;
+      border-radius: 12px;
+      padding: 1.5rem 1.6rem 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .chapter-legacy { border-left-color: var(--legacy); }
+    .chapter-nuevo { border-left-color: var(--nuevo); }
+    .chap-label {
+      display: inline-block;
+      margin: 0 0 0.65rem;
+      padding: 0.18rem 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: 4px;
+    }
+    .chapter-legacy .chap-label { color: var(--legacy); background: var(--legacy-soft); }
+    .chapter-nuevo .chap-label { color: var(--nuevo); background: var(--nuevo-soft); }
+    h2 { font-size: 1.35rem; margin: 0 0 1rem; }
+    h3 { font-size: 1.1rem; margin: 1.5rem 0 0.55rem; }
+    h4 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+    p { margin: 0 0 0.9rem; }
+    ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+    li { margin-bottom: 0.4rem; }
+    code {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.88em;
+      background: var(--code-bg);
+      padding: 0.12em 0.4em;
+      border-radius: 4px;
+      color: var(--code);
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-left-width: 4px;
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    pre code { background: none; padding: 0; }
+    a { color: var(--accent); }
+    details.fold { margin: 0 0 0.75rem; }
+    details.fold > summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 0.15rem 0.35rem 0.25rem;
+      border-radius: 8px;
+    }
+    details.fold > summary:hover { background: #f8fafc; }
+    details.fold > summary::-webkit-details-marker { display: none; }
+    details.fold > summary::marker { content: ""; }
+    details.fold > summary h3 { display: inline; margin: 0; font-size: 1.05rem; }
+    .fold-hint {
+      display: inline-block;
+      margin-left: 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--muted);
+      vertical-align: middle;
+    }
+    details.fold:not([open]) > summary .fold-hint::after { content: "Abrir"; }
+    details.fold[open] > summary .fold-hint::after { content: "Cerrar"; }
+    .case {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.85rem 1.1rem 0.35rem;
+      margin: 0.65rem 0 0;
+      background: #fff;
+    }
+    .case h4 { margin-top: 0.35rem; }
+    .case-legacy { border-left: 5px solid var(--legacy); background: var(--legacy-bg); }
+    .case-nuevo { border-left: 5px solid var(--nuevo); background: var(--nuevo-bg); }
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      margin: 0 0.25rem 0.4rem 0;
+    }
+    .tag-legacy { background: var(--legacy-soft); color: var(--legacy); }
+    .tag-nuevo { background: var(--nuevo-soft); color: var(--nuevo); }
+    .tag-react { background: var(--react-soft); color: var(--react); }
+    .tag-java { background: var(--java-soft); color: var(--java); }
+    .lab { font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; margin: 0.7rem 0 0.2rem; }
+    .lab-ok { color: var(--ok); }
+    .lab-fail { color: var(--warn); }
+    .box-ok { background: var(--ok-bg); border-left: 4px solid var(--ok-border); border-radius: 6px; padding: 0.65rem 0.8rem; margin: 0 0 0.7rem; }
+    .box-warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); border-radius: 6px; padding: 0.65rem 0.8rem; margin: 0 0 0.7rem; }
+    .box-ok > p, .box-warn > p { margin: 0; }
+    .proscons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin: 0.85rem 0 0.4rem;
+    }
+    @media (max-width: 720px) {
+      .proscons { grid-template-columns: 1fr; }
+    }
+    .proscons .box-ok, .proscons .box-warn { margin-bottom: 0; }
+    .proscons .lab { margin-top: 0; }
+    .proscons ul { margin: 0.35rem 0 0; padding-left: 1.15rem; }
+    .proscons li { margin-bottom: 0.28rem; font-size: 0.9rem; }
+    .pill {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.12rem 0.4rem;
+      border-radius: 4px;
+      margin-right: 0.2rem;
+    }
+    .pill-fast { background: var(--fast-bg); color: var(--fast); }
+    .pill-think { background: var(--think-bg); color: var(--think); }
+    .ver-mas { font-size: 0.85rem; color: var(--muted); }
+    .puntos-clave {
+      background: var(--ink);
+      color: #f8fafc;
+      border-radius: 16px;
+      padding: 1.35rem 1.5rem 1.45rem;
+      margin-bottom: 1.25rem;
+    }
+    .puntos-clave .kicker-clave {
+      margin: 0 0 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #93c5fd;
+    }
+    .puntos-clave h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.15rem;
+      color: #fff;
+    }
+    .puntos-clave ol {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+    .puntos-clave li {
+      margin-bottom: 0.45rem;
+      color: #e2e8f0;
+    }
+    .puntos-clave li:last-child { margin-bottom: 0; }
+    .puntos-clave a { color: #93c5fd; }
+    .puntos-clave code {
+      background: #1e2937;
+      color: #f8fafc;
+    }
+    .badge-clave {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: #fff;
+      padding: 0.14rem 0.42rem;
+      border-radius: 4px;
+      margin: 0 0 0.4rem;
+    }
+    .callout-clave {
+      background: var(--ink);
+      color: #e2e8f0;
+      border-left: 4px solid #93c5fd;
+      padding: 0.7rem 0.95rem;
+      margin: 0.85rem 0 1rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .callout-clave p { margin: 0; }
+    .callout-clave strong { color: #fff; }
+    .callout-clave a { color: #93c5fd; }
+    footer { font-size: 0.85rem; color: var(--muted); margin-top: 1.5rem; }
+    @media print {
+      body { background: #fff; font-size: 11.5pt; }
+      details.fold { break-inside: avoid; }
+      details > *:not(summary) { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero" id="inicio">
+      <p class="kicker">Documentación de equipo</p>
+      <h1>Casos prácticos: legacy vs. proyecto nuevo</h1>
+      <p class="lede">El archivo que se envía. Cada ficha es un ticket de hoy: qué decirle al chat, qué modelo, qué ya tiene que estar en <code>AGENTS.md</code>. No es la enciclopedia.</p>
+      <p class="meta">Septiembre 2026 · Consultora / producto genérico. Sin nombres de cliente ni de un portfolio concreto.</p>
+    </header>
+
+    <aside class="puntos-clave" id="puntos-clave" aria-label="Puntos clave">
+      <p class="kicker-clave">Para quien recibe el HTML</p>
+      <h2>Puntos clave</h2>
+      <ol>
+        <li>No hace falta leerlo entero.</li>
+        <li>Reglas del equipo en Git: <code>AGENTS.md</code> o <code>CLAUDE.md</code> según la herramienta, corto, no en el chat.</li>
+        <li>Chat nuevo si cambiaste el MD o el hilo está inflado.</li>
+        <li>Arquitectura: modelo que razona. Ticket chico: modelo rápido.</li>
+        <li>Cuidá tokens: no dupliques reglas, no pegues el repo.</li>
+        <li>Prompts para pegar: <a href="casos/prompts-base.md"><code>casos/prompts-base.md</code></a>.</li>
+        <li>Legacy: no reescribir. Nuevo: mapa de carpetas el día 0. <a href="#hub">Este archivo</a>.</li>
+        <li>Si choca con el producto, gana el enlace oficial. <a href="guia-agentes-reglas-y-modelos.html#referencias">Referencias</a>.</li>
+      </ol>
+    </aside>
+
+    <section class="hub" id="hub" aria-label="Portada">
+      <p class="hub-one-liner">Elegí el río: código que ya está, o repo que todavía no tiene features.</p>
+      <h2>Dos columnas. Un click.</h2>
+      <div class="hub-grid">
+        <div class="hub-col legacy">
+          <span class="badge-clave">Clave 7</span>
+          <h3>Legacy</h3>
+          <p class="lead">Producción o monolito. Tocá poco. No reescribas el módulo.</p>
+          <ol>
+            <li><a href="#l1">Bug de producción, un módulo</a></li>
+            <li><a href="#l2">Endpoint Spring en capas existentes</a></li>
+            <li><a href="#l3">No partir el monolito</a></li>
+            <li><a href="#l4">Mismo patrón que el vecino</a></li>
+            <li><a href="#l5">Un test, no una suite nueva</a></li>
+            <li><a href="#l6">Leer con Opus, parche con Composer</a></li>
+            <li><a href="#l7">Cambio SMTP / ops en Java existente</a></li>
+            <li><a href="#l8">Angular: cambio en módulo existente</a></li>
+            <li><a href="#l9">Android: mismo patrón, no reescribir</a></li>
+          </ol>
+        </div>
+        <div class="hub-col nuevo">
+          <span class="badge-clave">Clave 7</span>
+          <h3>Proyecto nuevo</h3>
+          <p class="lead">Día 0. El mapa va antes que la feature. Un stack, no dos.</p>
+          <ol>
+            <li><a href="#n1">Día 0: AGENTS.md + mapa</a></li>
+            <li><a href="#n2">Primera tajada vertical</a></li>
+            <li><a href="#n3">Stack escrito, no React+Angular</a></li>
+            <li><a href="#n4">Comando de CI / test en el MD</a></li>
+            <li><a href="#n5">Flags; no dorar el prototipo</a></li>
+            <li><a href="#n6">Review de arquitectura una vez</a></li>
+            <li><a href="#n7">Primera feature sin inventar auth</a></li>
+            <li><a href="#n8">Angular: día 0 + tajada vertical</a></li>
+          </ol>
+        </div>
+      </div>
+      <p class="hub-share">Índice: <a href="guia-inicio.html">guia-inicio.html</a>. Prompts para pegar: <a href="casos/prompts-base.md">casos/prompts-base.md</a>. Manual (solo “ver más”): <a href="guia-agentes-reglas-y-modelos.html">guia-agentes-reglas-y-modelos.html</a>.</p>
+    </section>
+
+    <section class="chapter chapter-legacy" id="legacy">
+      <p class="chap-label">Código que ya está</p>
+      <h2>Legacy (9 casos)</h2>
+      <div class="callout-clave">
+        <p><strong>Importante</strong> — clave 7: no reescribir. Lista: <a href="#puntos-clave">Puntos clave</a>.</p>
+      </div>
+      <p>El código mezcla capas, faltan tests, el estilo es el del vecino. El ticket gana si el diff cabe en una review de 15 minutos.</p>
+
+      <details class="fold" id="l1">
+        <summary><h3>L1 · Bug de producción, sin reescribir el módulo</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-react">React</span>
+          <h4>Un síntoma. Los componentes ya existen.</h4>
+          <p class="lab">Contexto</p>
+          <p>Catálogo en producción. Al cambiar la categoría con página &gt; 1, la grilla queda vacía: <code>FilterBar</code> actualiza el filtro y <code>ProductList</code> sigue pidiendo <code>page=4</code>. El contrato HTTP no cambia. No hay ticket de login ni de rediseño.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> nuevo, workspace en la raíz. Un síntoma. No reusar el hilo de ayer.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> (Composer / Grok). <span class="pill pill-think">pensar</span> solo si el estado vive en tres padres.</li>
+            <li><strong>AGENTS.md:</strong> mapa <code>src/pages/</code>, <code>src/components/</code>, <code>src/api/</code>; “solo lo que el ticket nombra”; no store ni admin; si hay spec, extenderlo.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#r1-bug-en-un-componente-que-ya-existe">prompts-base R1</a>. Corto:</p>
+          <pre><code>Bug acotado. No rediseñes.
+Síntoma: [al cambiar categoría con page&gt;1 la grilla queda vacía].
+Componentes: [FilterBar, ProductList, Pagination].
+Tocá solo esos archivos y el spec si existe.
+Al cambiar filtro, page = 1. Sin login, store ni cliente HTTP nuevo.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Diff de tres componentes que el equipo ya conoce.</li>
+                <li>El modelo rápido alcanza si el mapa está escrito.</li>
+                <li>No toca el contrato HTTP.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Sin acotar, el rápido “mejora” media app.</li>
+                <li>Opus acá puede proponer un rediseño de estado.</li>
+                <li>Si el filtro vive en tres padres, deja de ser local.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Categoría con <code>page &gt; 1</code> vuelve a página 1. Mismos componentes, mismo rol. Spec tocado en rojo→verde si existía. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> Zustand “para el filtro”, una ruta de admin, o extraer un hook genérico de tres pantallas.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#tr-react-bug">#tr-react-bug</a> · ficha <a href="casos/react-bug-acotado.md">react-bug-acotado.md</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l2">
+        <summary><h3>L2 · Endpoint Spring en las capas que ya hay</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-java">Java</span>
+          <h4>GET nuevo. Mismo controller, service y repository.</h4>
+          <p class="lab">Contexto</p>
+          <p>Spring Boot en marcha. Ticket: <code>GET /api/shipments/{id}/events</code>. Ya existen <code>Shipment</code>, el repository y un controller con el GET del envío. Hay que agregar lectura, no un bounded context.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> nuevo. Nombrá el GET vecino a copiar. Un solo artefacto.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> con el vecino. <span class="pill pill-think">pensar</span> si propone módulo Maven o hexagonal.</li>
+            <li><strong>AGENTS.md:</strong> controller delgado → service → repository → DTO; no <code>*Entity</code> en JSON; JUnit del patrón del módulo; un deploy.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p><a href="casos/prompts-base.md#j1-endpoint-nuevo-en-capas">prompts-base J1</a>. Corto:</p>
+          <pre><code>Endpoint nuevo, mismas capas que el vecino. Un Spring Boot.
+GET /api/shipments/{id}/events. Paquete de shipments, no "events-service".
+Controller sin SQL. JSON = DTO. JUnit como el GET vecino.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El patrón ya está: copiar el GET hermano.</li>
+                <li>Composer alcanza si el MD nombra las tres capas.</li>
+                <li>Un test de service o WebMvcTest cierra el contrato.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>El atajo (SQL en el controller) compila.</li>
+                <li>Opus sin mapa rediseña “bien” el servicio.</li>
+                <li>Sin JUnit en el MD, queda “probado a mano”.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El GET responde DTO. Tres tipos (controller / service / repository). Camino feliz + “no existe” si ese 404 ya es convención. <code>./mvnw test</code> en el módulo. Sin segundo Boot.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>@Query</code> en el controller, devolver <code>*Entity</code>, o un segundo <code>@SpringBootApplication</code>.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#tr-java-endpoint">#tr-java-endpoint</a> · <a href="casos/java-spring-endpoint.md">java-spring-endpoint.md</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l3">
+        <summary><h3>L3 · No partir el monolito en microservicios</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-java">Java</span>
+          <h4>Un campo. Un JAR. Nadie pidió Kafka.</h4>
+          <p class="lab">Contexto</p>
+          <p>Facturación: un deploy, un esquema, paquetes <code>invoice</code>, <code>customer</code>, <code>mail</code>. Ticket: persistir <code>notes</code> (texto corto) en la tabla que ya existe. El código mezcla un poco las capas; el backlog no pide split.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> ticket literal (“campo notes, mismos archivos que dueDate”). Si ya apareció un <code>*-service</code>, chat <strong>nuevo</strong>, no negociar el split.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> para el campo. <span class="pill pill-think">pensar</span> solo para decir “no hace falta un proceso nuevo”.</li>
+            <li><strong>AGENTS.md:</strong> “un Spring Boot, un artefacto”; campo en el paquete dueño; prohibido segundo Boot, Kafka, hexagonalizar de paso.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p><a href="casos/prompts-base.md#j2-legacy-sin-microservicios">prompts-base J2</a>.</p>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Una línea “un deploy” evita un proyecto de infra fantasma.</li>
+                <li>El campo llega en un PR de 15 minutos.</li>
+                <li>Se puede tocar un mapper sin migrar el monolito.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>El legacy sigue mezclado; el MD no lo limpia.</li>
+                <li>Un prompt vago (“mejorá facturación”) autoriza el rediseño.</li>
+                <li>Opus es peligroso si el pedido dice “mejorá la arquitectura”.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Campo ida y vuelta en el API existente. Migración solo si el equipo ya versiona schema. Cero procesos nuevos. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>invoice-service</code>, docker-compose de cuatro servicios y un ADR de microservicios para un string.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#tr-java-legacy">#tr-java-legacy</a> · <a href="casos/java-spring-legacy.md">java-spring-legacy.md</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l4">
+        <summary><h3>L4 · Mismo patrón que el vecino (Android / Angular)</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag">Android / Angular</span>
+          <h4>Copiá el archivo de al lado. No el del tutorial.</h4>
+          <p class="lab">Contexto</p>
+          <p>App Android en MVVM, o front Angular con features por carpeta. Ticket chico: un campo más en la lista, un diálogo de confirmación, un método en el servicio que ya lista. Hay un vecino que hace exactamente eso. El riesgo no es “no saber el framework”: es que el agente traiga Compose Navigation nueva, un <code>HttpClient</code> en el componente, o una Activity gorda “porque es más simple”.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> nombrá el path del vecino. “Mismo paquete, mismo estilo. No inventes capa.”</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> si el vecino es obvio. <span class="pill pill-think">pensar</span> (T3) si duda entre Activity gorda y ViewModel.</li>
+            <li><strong>AGENTS.md:</strong> Android: ViewModel sin Views; HTTP en el repositorio/capa de datos. Angular: el componente no usa <code>HttpClient</code>; pasa por fachada/repositorio. “No crear árbol <code>features/</code> o módulo nuevo si el disco no lo tiene.”</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Angular: <a href="casos/prompts-base.md#a1-angular-cambio-en-el-módulo-que-ya-existe">A1</a>. Android: <a href="casos/prompts-base.md#d1-android-mismo-patrón-que-el-vecino">D1</a>. Si reescribe el toolkit: <a href="casos/prompts-base.md#d2-android-no-reescribir-la-arquitectura">D2</a> / <a href="casos/prompts-base.md#a3-angular-no-mezclar-patrones-react">A3</a>. Corto:</p>
+          <pre><code>Mismo patrón que el vecino. No el del tutorial.
+
+Vecino a copiar: [OrderListViewModel / pedidos.service.ts / path].
+Ticket: [campo visible en la fila / diálogo al confirmar].
+Android: el ViewModel no importa Activity/Fragment; el diálogo lo muestra la vista.
+Angular: HTTP solo en el servicio/fachada, no en el .ts de la plantilla.
+No Navigation Component nuevo, no módulo Angular nuevo, no librería.
+Listá archivos (máximo los del paquete) y esperá OK de una línea.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El review compara con un archivo que ya pasó QA.</li>
+                <li>Haiku/Composer copian bien si el vecino está nombrado.</li>
+                <li>No se cuela un segundo estilo en el mismo módulo.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Si el vecino ya está mal, el agente multiplica el atajo.</li>
+                <li>Sin path concreto, trae “best practice” de 2024.</li>
+                <li>Un modelo capaz justifica Compose/signals “para modernizar”.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El diff se lee al lado del vecino: mismos nombres, misma capa. Cero librerías nuevas. El diálogo o el campo se puede demo en el flujo existente.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> lógica en la Activity; <code>HttpClient</code> en el componente; o un módulo <code>shared-ui/</code> “para reutilizar el diálogo”.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#arquitectura">#arquitectura</a> · Angular <a href="casos/prompts-base.md#a1-angular-cambio-en-el-módulo-que-ya-existe">A1</a> · Android <a href="casos/prompts-base.md#d1-android-mismo-patrón-que-el-vecino">D1</a> · si duda el patrón, <a href="casos/prompts-base.md#t3-arquitectura-esto-rompe-el-patrón">T3</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l5">
+        <summary><h3>L5 · Faltan tests: agregá uno, no reescribas la suite</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-react">React</span>
+          <span class="tag tag-java">Java</span>
+          <h4>El módulo viejo casi no tiene specs. Un caso del invariante.</h4>
+          <p class="lab">Contexto</p>
+          <p>El arreglo ya está (o va en el mismo PR). El módulo tiene cero tests, o tres verdes que no cubren el síntoma. El equipo no pidió “cobertura del paquete” ni migrar de JUnit 4 a 5, ni de Jest a Vitest.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> “un caso en el spec que ya existe, o un archivo junto al código, estilo vecino”. Corré solo ese path.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span>. <span class="pill pill-think">pensar</span> solo si hay que elegir unit vs. e2e — y igual no instales Playwright de paso.</li>
+            <li><strong>AGENTS.md:</strong> comando (<code>npm test</code> / <code>./mvnw test</code>); “no reescribir tests verdes”; “cambio de invariante → test”; runner del disco, no otro.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Front: <a href="casos/prompts-base.md#r5-tests-vitest--testing-library">prompts-base R5</a>. Java: <a href="casos/prompts-base.md#j4-junit-del-invariante">J4</a>.</p>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Un spec vecino es más barato que una suite nueva.</li>
+                <li>CI atrapa la regresión sin un rewrite de infra.</li>
+                <li>El review ve rojo→verde en un archivo.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>El rápido declara “es chico” y saltea el test.</li>
+                <li>Pedir 100% genera tests que repiten la implementación.</li>
+                <li><code>@SpringBootTest</code> de 40 s para un <code>if</code> si no era la convención.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El caso nuevo falla en HEAD (o si revertís el fix) y pasa con el arreglo. Comando y salida pegados. Cero infra nueva de test. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> carpeta <code>__tests__/</code> nueva, snapshots del árbol, <code>@Disabled</code>, o reescribir 20 tests verdes para esconder un refactor.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#tr-react-tests">#tr-react-tests</a> · <a href="guia-agentes-reglas-y-modelos.html#tr-java-junit">#tr-java-junit</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l6">
+        <summary><h3>L6 · Primero leer (Opus), después un parche chico (Composer)</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-react">React</span>
+          <span class="tag tag-java">Java</span>
+          <h4>Exploración de solo lectura. Plan cerrado. Chat B implementa.</h4>
+          <p class="lab">Contexto</p>
+          <p>El módulo es grande y el síntoma no es obvio (estado duplicado, regla de anulación, un job que toca mail y persistencia). Un solo hilo “pensá y codeá” termina moviendo carpetas. El equipo quiere entender el cauce y luego un diff acotado.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat A:</strong> <span class="pill pill-think">pensar</span> (Opus / GPT). Ask o “no edites”. Paths, qué no tocar, tests, riesgo de capas. Máximo 6 pasos.</li>
+            <li><strong>Chat B nuevo:</strong> <span class="pill pill-fast">rápido</span> (Composer / Grok). Pegá el plan. “No lo mejores. No agregues archivos que el plan no nombra.”</li>
+            <li><strong>AGENTS.md:</strong> mapa y prohibiciones ya mergeados (valen en ambos chats). El plan no vive en el MD; caduca con el ticket.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Los dos bloques: <a href="casos/prompts-base.md#t8-pairing-plan-con-opus-implementar-con-composer">prompts-base T8</a>.</p>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Opus no parchea a ciegas; Composer no diseña el mapa.</li>
+                <li>El diff del rápido ⊆ lista del plan: reviewable.</li>
+                <li>Si el plan choca con el disco, se para antes de codear.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Dos chats: hay que pegar el plan, no “acordarse”.</li>
+                <li>Composer “completa” el plan si no se lo prohibís.</li>
+                <li>Un solo chat Auto suele elegir rápido y saltarse el mapa.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Plan con paths, sin snippets masivos. Lista de files del Chat B = lista del plan. Tests del plan corridos. Review humano (R6 / J5 si el diff lo escribió el agente).</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> Opus también edita; o Composer agrega un archivo “por si hace falta” que el plan no nombraba.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#vd-fast-vs-think">#vd-fast-vs-think</a> · <a href="guia-agentes-reglas-y-modelos.html#flujo-dia-0">#flujo-dia-0</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l7">
+        <summary><h3>L7 · Cambio SMTP / ops en Java que ya envía correo</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-java">Java</span>
+          <h4>Host, timeout o un envío de prueba. El mailer ya existe.</h4>
+          <p class="lab">Contexto</p>
+          <p>El servicio Java ya manda notificaciones (JavaMail, Spring Mail, o un cliente SMTP del módulo <code>mail</code>). El ticket es ops: timeout, From, o un envío de prueba desde el mismo entry point que el equipo ya usa en no-prod (un <code>main</code> de herramienta, un job, un perfil <code>dev</code>). No es “plataforma de mail”. No hay nombres de cliente ni de un banco en el prompt.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> path del mailer actual + qué cambia (propiedad, timeout, comando de prueba). “No inventes un microservicio de correo.”</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> para el parche. <span class="pill pill-think">pensar</span> solo si el agente propone broker o segundo Boot.</li>
+            <li><strong>AGENTS.md:</strong> un deploy; secretos por variable de entorno, no en código; no loguear destinatarios ni el cuerpo; no tocar prod; el test de envío usa el mecanismo que el módulo ya tiene.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <pre><code>Cambio SMTP en el mailer que YA existe. No un producto de correo.
+
+Path: [paquete mail / MailSender / application-*.yml del perfil no-prod].
+Cambio: [timeout / From / comando de prueba en el entry point que ya usa el equipo].
+Prohibido: segundo Boot, Kafka "de mail", librería nueva, hardcodear host/password,
+loguear destinatario o cuerpo, tocar prod, inventar nombres de cliente.
+Secretos: solo env vars que el módulo ya lea.
+DoD: el envío de prueba usa el mismo cliente; diff en el paquete mail + config;
+sin commit. Si hace falta un dato de host, preguntá; no lo inventes.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Reutiliza el cliente y los perfiles que ops ya conoce.</li>
+                <li>El MD de secretos evita un password en el diff.</li>
+                <li>Un timeout o un From es un PR de un paquete.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>El agente “mejora” a un bus de eventos para un mail.</li>
+                <li>Un prompt vago pide credenciales; hay que parar.</li>
+                <li>Un test real contra SMTP de prod no es el DoD.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>La propiedad o el comando de prueba está en el módulo <code>mail</code> existente. Cero secretos en Git. Logs sin destinatario ni cuerpo. Sin push a prod. El equipo corre la prueba en el entorno que ya usa para eso.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>mail-service</code> nuevo, password en <code>application.yml</code>, o un log <code>INFO</code> con el mensaje completo.</p></div>
+          <p class="ver-mas">Ver más: capas y un deploy en <a href="guia-agentes-reglas-y-modelos.html#tr-java-legacy">#tr-java-legacy</a> · Git/secretos <a href="guia-agentes-reglas-y-modelos.html#equipo">#equipo</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l8">
+        <summary><h3>L8 · Angular: cambio en el módulo que ya está</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag">Angular</span>
+          <h4>Un campo o un diálogo. El NgModule (o la carpeta) ya existe.</h4>
+          <p class="lab">Contexto</p>
+          <p>Front Angular en producción. Ticket: un campo más en la lista de pedidos, o un diálogo de confirmación en la pantalla que ya lista. El módulo <code>pedidos</code> (o la carpeta feature del disco) ya tiene componente, servicio y rutas. No hay ticket de standalone, de signals en todo el árbol, ni de un segundo SPA.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> nombrá el componente y el servicio vecinos. “Mismo módulo. No crees otro.”</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> si el vecino es obvio. <span class="pill pill-think">pensar</span> (T3) si propone <code>HttpClient</code> en el <code>.ts</code> de la plantilla o un módulo nuevo.</li>
+            <li><strong>AGENTS.md:</strong> componente flaco; HTTP en servicio/fachada, no en el componente; “no módulo Angular nuevo si el disco no lo tiene”; no mezclar React.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#a1-angular-cambio-en-el-módulo-que-ya-existe">prompts-base A1</a>. Si duda el patrón: <a href="casos/prompts-base.md#t3-arquitectura-esto-rompe-el-patrón">T3</a>. Corto:</p>
+          <pre><code>Cambio Angular en el módulo que YA existe. No reescribas el front.
+
+Módulo / carpeta: [src/app/pedidos/ o el path del disco].
+Vecino a copiar: [pedidos-list.component.ts / pedidos.service.ts].
+Ticket: [campo en la fila / diálogo al confirmar].
+El componente no usa HttpClient; pasa por el servicio/fachada que ya lista.
+No módulo nuevo, no tree features/ si el disco no lo tiene, no React, no librería.
+Listá archivos (máximo los del módulo) y esperá OK de una línea.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El review compara con el servicio que ya pasó QA.</li>
+                <li>Haiku/Composer copian el patrón si el path está nombrado.</li>
+                <li>No se cuela un segundo estilo en el mismo feature.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Sin path, trae standalone + signals “porque es el default de 2025”.</li>
+                <li>Un modelo capaz justifica un <code>shared-ui/</code> para un diálogo.</li>
+                <li>Si pegás R2 (React) en un repo Angular, el agente trae <code>src/api/</code>. Usá A1.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El diff vive en el módulo existente. Cero <code>HttpClient</code> en el componente. Cero módulo o librería nueva. El campo o el diálogo se ve en el flujo que ya está.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>HttpClient</code> en el <code>.ts</code> de la plantilla; un NgModule <code>PedidosV2</code>; o un componente React “para comparar”.</p></div>
+          <p class="ver-mas">Ver más: <a href="#l4">L4</a> (vecino) · <a href="guia-agentes-reglas-y-modelos.html#arquitectura">#arquitectura</a> · <a href="casos/prompts-base.md#a1-angular-cambio-en-el-módulo-que-ya-existe">A1</a> / T3.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l9">
+        <summary><h3>L9 · Android: mismo patrón, no reescribir la arquitectura</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag">Android</span>
+          <h4>Un campo o un diálogo. MVVM (o el que ya está) se queda.</h4>
+          <p class="lab">Contexto</p>
+          <p>App Android nativa. Ticket chico: un campo más en la fila, o un diálogo al confirmar. El paquete ya tiene pantalla + ViewModel + repositorio. El riesgo no es Kotlin: es que el agente migre a Compose Navigation, meta lógica en la Activity, o reescriba XML a Compose “de paso”.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> nombrá el ViewModel vecino. “Misma capa. No Navigation nuevo.”</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> si el vecino es obvio. <span class="pill pill-think">pensar</span> (T3) si duda entre Activity gorda y ViewModel.</li>
+            <li><strong>AGENTS.md:</strong> ViewModel sin Views; HTTP en repositorio/capa de datos; “no Compose Navigation / no librería si el disco no lo tiene”.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#d1-android-mismo-patrón-que-el-vecino">prompts-base D1</a>. Si reescribe el toolkit: <a href="casos/prompts-base.md#d2-android-no-reescribir-la-arquitectura">D2</a>. T3 solo si duda el patrón. Corto:</p>
+          <pre><code>Cambio Android en el paquete que YA existe. No reescribas la arquitectura.
+
+Paquete: [ui.orders / data.orders o el path del disco].
+Vecino: [OrderListViewModel].
+Ticket: [campo en la fila / diálogo al confirmar].
+El ViewModel no importa Activity/Fragment; el diálogo lo muestra la vista.
+HTTP en el repositorio, no en la Activity.
+No Navigation Component nuevo, no migrar XML→Compose, no librería.
+Listá archivos (máximo los del paquete) y esperá OK de una línea.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El review compara con un ViewModel que ya pasó QA.</li>
+                <li>Un campo no abre un proyecto de navegación.</li>
+                <li>El MD de “sin Views en el VM” corta el atajo típico.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Si el vecino ya tiene lógica en la Activity, el agente la copia.</li>
+                <li>Sin path, trae Compose + NavHost “moderno”.</li>
+                <li>Si pegás T3 como implementación, el agente review-ea y no parchea. Usá D1.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El diff se lee al lado del vecino. Cero librerías nuevas. Cero rewrite de UI toolkit. El diálogo o el campo se puede demo en el flujo existente.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> lógica en la Activity; NavHost nuevo; o reescribir la pantalla a Compose porque el modelo “ya lo sabe”.</p></div>
+          <p class="ver-mas">Ver más: <a href="#l4">L4</a> · <a href="guia-agentes-reglas-y-modelos.html#arquitectura">#arquitectura</a> (MVVM) · <a href="casos/prompts-base.md#d1-android-mismo-patrón-que-el-vecino">D1</a> / <a href="casos/prompts-base.md#d2-android-no-reescribir-la-arquitectura">D2</a>.</p>
+        </article>
+      </details>
+    </section>
+
+    <section class="chapter chapter-nuevo" id="nuevo">
+      <p class="chap-label">Repo que todavía no tiene producto</p>
+      <h2>Proyectos nuevos (8 casos)</h2>
+      <div class="callout-clave">
+        <p><strong>Importante</strong> — clave 7: mapa de carpetas el día 0. Lista: <a href="#puntos-clave">Puntos clave</a>.</p>
+      </div>
+      <p>Acá el agente no tiene “vecinos” que lo frenen. Si el mapa no está el día 0, mezcla React con Angular, inventa auth y dora el prototipo.</p>
+
+      <details class="fold" id="n1">
+        <summary><h3>N1 · Día 0: AGENTS.md + mapa de carpetas, antes de features</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <span class="tag tag-java">Java</span>
+          <h4>El primer commit de reglas. Cero pantallas todavía.</h4>
+          <p class="lab">Contexto</p>
+          <p>Repo vacío o scaffold fresco (Vite + Spring, o el par que eligió el equipo). La tentación es “tirá la login y el dashboard”. El día 0 es el mapa: quién habla con quién, comandos, prohibiciones. Después, chat <strong>nuevo</strong> para la primera feature.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> “solo docs de reglas. No implementes producto.” Workspace en la raíz que va a ser el repo.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-think">pensar</span> para el mapa (¿raíz vs. anidado?). Copiar bloques: <span class="pill pill-fast">rápido</span>.</li>
+            <li><strong>AGENTS.md:</strong> todavía no existe: este chat lo crea. Raíz corta (15–25 líneas) + anidado <code>frontend/</code> y <code>api/</code> si es mixto. No un tratado de 400 líneas.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Mapa listo para pegar: snippets <a href="casos/prompts-base.md#s1-mapa-va-en-agentsmd">S1–S4</a>. Corto:</p>
+          <pre><code>Día 0. Solo AGENTS.md (y anidados si el repo es mixto). No features.
+Escribí el mapa del disco que VAMOS a usar: [frontend React Vite / api Spring].
+Quién habla con quién. Tests: npm test y ./mvnw test. No commit si no lo pido.
+No fusiones React y JPA en un solo archivo de 400 líneas.
+Cuando termines: listá paths creados y pará. La primera pantalla es OTRO chat.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El próximo chat hereda el cauce sin que nadie lo recuerde.</li>
+                <li>Dos anidados evitan reglas de JPA en un ticket de CSS.</li>
+                <li>Barato: se commitea una vez con el scaffold.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Un MD de libro (hexagonal + FSD) no es este disco.</li>
+                <li>Si implementás la feature en el mismo chat, el mapa llega tarde.</li>
+                <li>Claude Code no lee <code>AGENTS.md</code> solo: hace falta <code>CLAUDE.md</code> o <code>@</code>.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Hay raíz corta + anidado del stack que existe. Un humano puede señalar “front acá, API acá”. Cero componentes de producto en ese diff. Chat nuevo para N2.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> “de paso armo el login” o un <code>AGENTS.md</code> que copia Clean Architecture de un blog y no las carpetas del scaffold.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#flujo-dia-0">#flujo-dia-0</a> · <a href="casos/portable-agents.md">portable-agents.md</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="n2">
+        <summary><h3>N2 · Primera tajada vertical (una pantalla + una API)</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <span class="tag tag-java">Java</span>
+          <h4>Un recurso de punta a punta. No el producto entero.</h4>
+          <p class="lab">Contexto</p>
+          <p>El mapa del día 0 ya está en Git. El primer valor: listar (o crear) un recurso — p. ej. pedidos: <code>GET /api/orders</code> + una página <code>OrderList</code>. Misma query, DTO acordado. No admin, no pagos, no segundo recurso “para que quede redondo”.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> uno para el contrato (o el GET si el back va primero), otro para la UI, o un plan T8 y luego Composer. No un hilo que abra diez tickets.</li>
+            <li><strong>Modelo:</strong> plan <span class="pill pill-think">pensar</span> si hay que decidir el shape del DTO. Implementar: <span class="pill pill-fast">rápido</span> con paths del mapa.</li>
+            <li><strong>AGENTS.md:</strong> ya escrito (N1). El chat nombra <code>OrderList</code> + <code>OrderController</code> y el cliente en <code>src/api/</code>. No crees <code>src/features/</code>.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Front: <a href="casos/prompts-base.md#r2-feature-ui--cliente-http">R2</a>. API: <a href="casos/prompts-base.md#j1-endpoint-nuevo-en-capas">J1</a>. Arranque de sesión: <a href="casos/prompts-base.md#t1-primer-chat-del-día">T1</a>.</p>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Hay algo demoable: lista + GET.</li>
+                <li>El cauce se prueba en un flujo real, no en un ADR.</li>
+                <li>El siguiente recurso copia este, no un tutorial.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Un solo chat rápido hace endpoint + <code>fetch</code> en el JSX.</li>
+                <li>Sin DTO acordado, el front inventa campos.</li>
+                <li>La tajada se infla a “CRUD completo + filtros + export”.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Una pantalla usa el cliente en <code>src/api/</code>. El GET responde DTO. Tests del patrón del repo (un spec de lista o del service). Sin auth inventada (eso es N7). Sin commit si no se pidió.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> dashboard + usuarios + pedidos en el mismo PR, o un segundo árbol <code>features/orders/</code> el primer día.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#tr-react-feature">#tr-react-feature</a> · <a href="guia-agentes-reglas-y-modelos.html#tr-java-endpoint">#tr-java-endpoint</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="n3">
+        <summary><h3>N3 · El stack va en el MD: no mezclar React y Angular</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <h4>Una frase en el disco. El agente deja de “completar” con el otro SPA.</h4>
+          <p class="lab">Contexto</p>
+          <p>Greenfield. El equipo eligió React + Vite (o Angular, o Next: <em>uno</em>). Sin esa línea, un modelo capaz mete <code>app/</code> de Next en un Vite, o un <code>angular.json</code> “porque el lead también conoce Angular”. En un mixto, el anidado de front no debe mencionar el otro framework.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> si el MD aún no lo dice, este chat solo escribe la línea y para. Feature en chat nuevo (T2).</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> para la línea. Review <span class="pill pill-think">pensar</span> si un PR ya mezcló árboles.</li>
+            <li><strong>AGENTS.md:</strong> “SPA React + Vite. No Next, no <code>app/</code>, no Angular. HTTP en <code>src/api/</code>.” O el inverso, si el repo es Angular.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <pre><code>Fijá el stack en el MD. No implementes UI.
+
+Este front es [React + Vite / Angular / Next]. Uno solo.
+Escribí 4–6 líneas en [frontend/AGENTS.md]: framework, carpetas del disco,
+prohibido el otro SPA y el otro router.
+No instales el framework que no elegimos. No crees angular.json ni app/ de Next.
+Chat de feature: después, T2.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Una línea corta el hábito de “traer el stack del entrenamiento”.</li>
+                <li>El review rechaza un segundo <code>package</code> de UI.</li>
+                <li>Portable: el anidado viaja con el front.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Si el lead cambia de opinión, hay que editar el MD y chat nuevo.</li>
+                <li>“React o Angular, el que quieras” autoriza el mix.</li>
+                <li>Un mega-MD de ambos stacks gasta tokens en cada ticket.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El MD nombra un framework y prohíbe el otro. <code>package.json</code> / estructura coincide. Ningún archivo del otro SPA en el diff de ese día.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> Vite + una carpeta <code>app/</code> de App Router, o un componente Angular generado “para comparar”.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#tr-react-folders">#tr-react-folders</a> · <a href="casos/react-arquitectura.md">react-arquitectura.md</a> · <a href="casos/prompts-base.md#r3-no-reescribir-carpetas">R3</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="n4">
+        <summary><h3>N4 · El comando de test / CI vive en el MD</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <span class="tag tag-java">Java</span>
+          <h4>Si no está escrito, el agente “lo prueba a mano” o instala otro runner.</h4>
+          <p class="lab">Contexto</p>
+          <p>Scaffold nuevo: Vitest en el front, Surefire o Gradle en la API, un workflow que corre esos dos. El agente cierra la primera feature sin correr nada, o agrega Jest/Playwright/Testcontainers “porque es más moderno”. CI no puede ser un secreto del lead.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> día 0 o el PR que agrega CI: una sección “Tests” con comandos literales y “corré el spec tocado”.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> para escribir la línea y el YAML si el equipo ya tiene plantilla. No Auto para “elegir el runner”.</li>
+            <li><strong>AGENTS.md:</strong> <code>npm test</code> / <code>npx vitest path</code>; <code>./mvnw test</code> (o Gradle). “No instales otro runner. Mostrá comando y salida. No afirmes verde si no corriste.”</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <pre><code>Documentá el comando de test en AGENTS.md (y anidados). No migres el runner.
+
+Front: [npm test / npx vitest]. API: [./mvnw test].
+CI ya corre [el workflow que exista; no inventes uno de 12 jobs].
+El agente debe correr el spec tocado y pegar salida.
+Prohibido Jest/Cypress/Playwright/Testcontainers de paso.
+No rewrite de tests verdes.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>CI es el candado; el MD solo recuerda el comando.</li>
+                <li>El review pide salida, no “los tests pasan” de oídas.</li>
+                <li>Evita un segundo framework de test el primer sprint.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>El MD no ejecuta Vitest: hace falta que el humano (o CI) lo corra.</li>
+                <li>Un comando mal copiado (<code>npm run test:e2e</code> que no existe) confunde.</li>
+                <li>Pedir el monorepo entero en cada bug gasta tiempo.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Los dos comandos (front y API, o el que exista) están en el MD. El workflow, si existe, llama esos mismos. El agente de N2 pegó salida real. Sin commit de un runner nuevo.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> “está funcionando” sin comando, o un <code>playwright.config</code> en el PR de la lista de pedidos.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#tr-react-tests">#tr-react-tests</a> · tokens/CI en <a href="guia-agentes-reglas-y-modelos.html#cuidar-tokens">#cuidar-tokens</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="n5">
+        <summary><h3>N5 · Flags y alcance: no dorar el prototipo</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <span class="tag tag-java">Java</span>
+          <h4>Si no está en el ticket, no va. Un if de flag, no un framework de experiments.</h4>
+          <p class="lab">Contexto</p>
+          <p>Primera o segunda feature. El modelo “deja listo” login, i18n, design system, feature-flag SaaS y un panel. El equipo a lo sumo necesita un boolean en config (<code>exportEnabled</code>) para no mostrar un botón. Nadie pidió LaunchDarkly.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> lista de fuera de alcance en el primer mensaje (R4). Si ya doró: recortar el diff, no discutir features.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span>, límites arriba. No Auto.</li>
+            <li><strong>AGENTS.md:</strong> S2 — “prohibido login, pagos, admin, store, librería nueva porque va a hacer falta”. Flag: “un boolean en la config que el repo ya use; no un SDK de experiments”.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p><a href="casos/prompts-base.md#r4-no-agrandar-el-alcance">prompts-base R4</a>. Si el botón debe poder apagarse:</p>
+          <pre><code>Alcance cerrado: [el botón Exportar].
+Si hace falta apagarlo: un boolean en [la config / env que el repo ya lea].
+No instales SDK de flags, no panel, no i18n extra, no design system.
+Si algo de eso te parece necesario, una frase y esperás. No lo codees.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El primer PR se lee en minutos.</li>
+                <li>Un boolean es reversible; un SDK no.</li>
+                <li>La regla S2 vale para todos los chats siguientes.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>“Production-ready” en el prompt autoriza el oro.</li>
+                <li>El agente deja código comentado “por si acaso”.</li>
+                <li>Sin S2 en el MD, hay que repetir R4 cada día.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El pedido funciona. El reviewer cuenta los archivos con los dedos. Cero SDK de flags. Cero features parásitas. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> Storybook + toasts + i18n + “dejo el login comentado” en el PR del export.</p></div>
+          <p class="ver-mas">Ver más: <a href="casos/prompts-base.md#r4-no-agrandar-el-alcance">R4</a> · flujo <a href="guia-agentes-reglas-y-modelos.html#flujo-dia-0">#flujo-dia-0</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="n6">
+        <summary><h3>N6 · Review de arquitectura una vez; después implementar</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <span class="tag tag-java">Java</span>
+          <h4>Greenfield: un sí/no de mapa. No un rediseño por ticket.</h4>
+          <p class="lab">Contexto</p>
+          <p>Antes de la primera feature (o cuando alguien quiere <code>src/features/</code> / hexagonal el día 2). Hace falta un veredicto: ¿el scaffold + AGENTS.md alcanzan? Si sí, se implementa N2. Si el equipo quiere otro árbol, se cambia el MD <em>antes</em>, no en el chat del botón.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat A:</strong> <span class="pill pill-think">pensar</span>, no editar. T3: ¿rompe el patrón? Paths. Alternativa mínima. Prohibido plan de migración de 12 pasos.</li>
+            <li><strong>Humano:</strong> acepta el mapa o cambia el MD (otro PR). Chat <strong>nuevo</strong> (T2).</li>
+            <li><strong>Chat B:</strong> T8 / R2 / J1. Composer no reabre la arquitectura.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p><a href="casos/prompts-base.md#t3-arquitectura-esto-rompe-el-patrón">prompts-base T3</a>, luego <a href="casos/prompts-base.md#t8-pairing-plan-con-opus-implementar-con-composer">T8</a>.</p>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>La discusión de carpetas ocurre una vez, no en cada badge.</li>
+                <li>Opus no implementa; Composer no diseña.</li>
+                <li>Si hay que cambiar el mapa, queda escrito en Git.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Hacer T3 en el mismo hilo que codea contamina el árbol.</li>
+                <li>Opus propone hexagonal si el prompt es “cómo lo harías vos”.</li>
+                <li>Sin T2, el hilo viejo sigue el árbol rechazado.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Un humano decide en un minuto. Cero diff en el chat de review. El chat de implementación respeta el mapa aceptado. Tests del plan.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> “review” que termina creando <code>src/features/</code> o <code>invoice-service</code> en el mismo hilo.</p></div>
+          <p class="ver-mas">Ver más: <a href="guia-agentes-reglas-y-modelos.html#arquitectura">#arquitectura</a> · <a href="guia-agentes-reglas-y-modelos.html#vd-opus">#vd-opus</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="n7">
+        <summary><h3>N7 · React Vite o Next: primera feature, sin inventar auth</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <h4>Lista o formulario público (o ya mockeado). Login es otro ticket.</h4>
+          <p class="lab">Contexto</p>
+          <p>Vite o Next, mapa N1/N3 ya escrito. Primera UI: la lista de N2, o un formulario de contacto. No hay IdP, no hay cookie session, no hay middleware de Next Auth. El agente, sin regla, arma <code>LoginPage</code>, <code>middleware.ts</code> y un JWT “mínimo”.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> “esta app todavía no tiene autenticación. No la agregues. Si el GET exige token en prod, usá el mock/header que el MD nombre, o preguntá.”</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span>. Si elige Next: no crear <code>app/</code> si el repo es Vite (N3).</li>
+            <li><strong>AGENTS.md:</strong> “no hay <code>src/auth/</code> ni rutas protegidas hasta un ticket de auth”; Next: “middleware solo si el ticket lo pide”; cliente HTTP sin pegar tokens inventados.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <pre><code>Primera feature de UI. No hay autenticación en este repo.
+
+Pantalla: [OrderList / ContactForm]. Stack: [Vite pages+components / Next app/].
+El GET [ya existe / se mockea en el api module]. Sin login, OAuth, JWT,
+middleware de auth, ni "lo dejo preparado".
+HTTP en [src/api/]. Misma regla R2/R4.
+DoD: la pantalla se ve y lista/envía; grep sin LoginPage ni next-auth.
+No commit.</code></pre>
+          <p>Si el alcance se infla: variante de <a href="casos/prompts-base.md#r4-no-agrandar-el-alcance">R4</a>.</p>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>La primera demo no arrastra un IdP fantasma.</li>
+                <li>Auth, cuando llegue, es un ticket con amenaza de seguridad real.</li>
+                <li>Vite y Next no se mezclan si N3 está escrito.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Un GET que en prod pide Bearer tienta al agente a inventar el token.</li>
+                <li>“Dejalo production-ready” = login el día 1.</li>
+                <li>Next: el middleware vacío “por costumbre” igual es alcance.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>La pantalla usa el mapa. Cero <code>LoginPage</code>, <code>next-auth</code>, JWT hardcodeado. El api module no inventa un usuario. Auth queda para un PR explícito, con reglas de secretos.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>/login</code> + localStorage de token + un usuario “admin@demo” en el código.</p></div>
+          <p class="ver-mas">Ver más: <a href="casos/prompts-base.md#r2-feature-ui--cliente-http">R2</a> · <a href="casos/prompts-base.md#r4-no-agrandar-el-alcance">R4</a> · <a href="guia-agentes-reglas-y-modelos.html#tr-react-feature">#tr-react-feature</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="n8">
+        <summary><h3>N8 · Angular: día 0 (AGENTS) + una tajada vertical</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag">Angular</span>
+          <h4>Mapa Angular primero. Después una pantalla + un GET. Nada más.</h4>
+          <p class="lab">Contexto</p>
+          <p>Greenfield. El equipo eligió Angular (un SPA). Sin mapa, el agente mete React, <code>src/features/</code> de tutorial, o auth “para que quede redondo”. El día 0 escribe el MD. El chat <strong>siguiente</strong> hace una lista (o un alta) con HTTP en el servicio, no en el componente.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat 1:</strong> solo reglas. Workspace en la raíz. “No implementes producto.”</li>
+            <li><strong>Chat 2:</strong> una pantalla + el cliente HTTP del mapa. Sin login.</li>
+            <li><strong>Modelo:</strong> mapa <span class="pill pill-think">pensar</span> (¿raíz vs. anidado?). Tajada: <span class="pill pill-fast">rápido</span> con paths ya escritos.</li>
+            <li><strong>AGENTS.md / CLAUDE.md:</strong> según la herramienta (clave 2). “SPA Angular. No React, no Next.” Carpetas del scaffold (<code>src/app/…</code>). Componente flaco; HTTP en servicio/fachada. Claude Code: <code>CLAUDE.md</code> o <code>@AGENTS.md</code>.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#a2-angular-día-0--tajada-vertical">prompts-base A2</a> (dos chats). Si mezcla React: <a href="casos/prompts-base.md#a3-angular-no-mezclar-patrones-react">A3</a>. Día 0 también: <a href="casos/prompts-base.md#s1-mapa-va-en-agentsmd">S1–S4</a> (decí Angular). Corto:</p>
+          <pre><code>Chat 1 — Día 0. Solo AGENTS.md (y CLAUDE.md si el equipo usa Claude Code).
+Este front es Angular. Uno solo. No React, no Next, no app/ de App Router.
+Escribí el mapa del disco: [src/app/… del scaffold]. Quién habla con quién.
+HTTP en servicio/fachada, no en el .ts de la plantilla.
+No features de producto en este chat. Listá paths y pará.
+
+Chat 2 — Una tajada. Chat NUEVO.
+Pantalla: [OrderList]. GET [ya existe / se mockea en el servicio].
+Mismo módulo que el mapa. Sin login, JWT, ni módulo auth.
+DoD: la lista se ve; grep sin LoginComponent ni HttpClient en el componente.
+No commit.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>N3 queda clavado: un SPA, no dos.</li>
+                <li>La demo es una lista, no un IdP.</li>
+                <li>El próximo recurso copia este módulo, no un tutorial de signals.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Si el mapa copia Clean Architecture de un blog, no es este disco.</li>
+                <li>Un solo chat hace MD + dashboard + auth.</li>
+                <li>Si pegás R2/R4 (React), el agente arma <code>src/pages/</code>. Usá A2.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Hay MD corto con “Angular, no React”. Una pantalla usa el servicio del mapa. Cero <code>HttpClient</code> en el componente. Cero login inventado. Chat de reglas distinto al de la tajada.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>angular.json</code> + una carpeta React “por si acaso”, o <code>HttpClient</code> en el componente el primer día.</p></div>
+          <p class="ver-mas">Ver más: <a href="#n1">N1</a> · <a href="#n2">N2</a> · <a href="#n3">N3</a> · <a href="casos/prompts-base.md#a2-angular-día-0--tajada-vertical">A2</a> / <a href="casos/prompts-base.md#a3-angular-no-mezclar-patrones-react">A3</a> / S1.</p>
+        </article>
+      </details>
+    </section>
+
+    <footer>
+      <p>17 casos (9 legacy + 8 nuevos). Para compartir sin mandar el manual. Nota de envío: <a href="LEEME-PARA-ENVIAR.md">LEEME-PARA-ENVIAR.md</a>. Índice: <a href="guia-inicio.html">guia-inicio.html</a>. Prompts: <a href="casos/prompts-base.md">casos/prompts-base.md</a> (A1–A3, D1–D2). Capítulos largos: <a href="guia-agentes-reglas-y-modelos.html#trabajo-real">#trabajo-real</a>.</p>
+      <p>Última redacción: septiembre 2026. No describe un producto de cliente ni un portfolio concreto.</p>
+    </footer>
+  </div>
+
+  <script id="fold-hash-script">
+    (function () {
+      function openAncestors(el) {
+        var node = el;
+        while (node) {
+          if (node.tagName === "DETAILS") node.open = true;
+          node = node.parentElement;
+        }
+      }
+      function applyHash() {
+        var id = location.hash.replace(/^#/, "");
+        if (!id) return;
+        openAncestors(document.getElementById(id));
+      }
+      applyHash();
+      window.addEventListener("hashchange", applyHash);
+    })();
+  </script>
+</body>
+</html>

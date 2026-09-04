@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Índice: reglas para agentes de IA</title>
+  <meta name="description" content="Portada corta de la guía de equipo: un click a cada capítulo o a los prompts para pegar.">
+  <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --bg: #f1f5f9;
+      --card: #fff;
+      --accent: #1d4ed8;
+      --accent-soft: #eff6ff;
+      --code: #0f172a;
+      --code-bg: #f1f5f9;
+      --use: #1e40af;
+      --react: #075985;
+      --java: #92400e;
+      --model: #5b21b6;
+      --docs: #065f46;
+      --legacy: #9a3412;
+      --nuevo: #0f766e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+      font-size: 17px;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+    header.hero {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    header.hero p.kicker {
+      margin: 0 0 0.5rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 0.75rem; }
+    .lede { color: var(--muted); margin: 0 0 1rem; }
+    .meta { font-size: 0.9rem; color: var(--muted); margin: 0; }
+    .hub {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.35rem 1.5rem 1.55rem;
+      margin-bottom: 1.25rem;
+    }
+    .hub-one-liner {
+      margin: 0 0 0.4rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .hub > h2 { font-size: 1.15rem; margin: 0 0 0.9rem; color: var(--muted); font-weight: 600; }
+    .hub-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    @media (min-width: 640px) {
+      .hub-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 900px) {
+      .hub-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    a.hub-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-left-width: 5px;
+      border-radius: 10px;
+      padding: 0.95rem 1rem 0.9rem;
+    }
+    a.hub-card:hover { box-shadow: 0 0 0 2px var(--accent-soft); }
+    a.hub-card h3 { margin: 0 0 0.35rem; font-size: 1.02rem; }
+    a.hub-card p { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.45; }
+    a.hub-card .hub-note {
+      display: block;
+      margin-top: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .hub-start { border-left-color: var(--use); }
+    .hub-prompts { border-left-color: var(--docs); }
+    .hub-casos { border-left-color: var(--react); }
+    .hub-model { border-left-color: var(--model); }
+    .hub-equipo { border-left-color: var(--java); }
+    .hub-refs { border-left-color: var(--docs); }
+    .hub-legacy { border-left-color: var(--legacy); }
+    .hub-nuevo { border-left-color: var(--nuevo); }
+    .hub-share { margin: 0.9rem 0 0; font-size: 0.85rem; color: var(--muted); }
+    code {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.88em;
+      background: var(--code-bg);
+      padding: 0.12em 0.4em;
+      border-radius: 4px;
+      color: var(--code);
+    }
+    a { color: var(--accent); }
+    .puntos-clave {
+      background: var(--ink);
+      color: #f8fafc;
+      border-radius: 16px;
+      padding: 1.35rem 1.5rem 1.45rem;
+      margin-bottom: 1.25rem;
+    }
+    .puntos-clave .kicker-clave {
+      margin: 0 0 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #93c5fd;
+    }
+    .puntos-clave h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.15rem;
+      color: #fff;
+    }
+    .puntos-clave ol {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+    .puntos-clave li {
+      margin-bottom: 0.45rem;
+      color: #e2e8f0;
+    }
+    .puntos-clave li:last-child { margin-bottom: 0; }
+    .puntos-clave a { color: #93c5fd; }
+    .puntos-clave code {
+      background: #1e2937;
+      color: #f8fafc;
+    }
+    .badge-clave {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: #fff;
+      padding: 0.14rem 0.42rem;
+      border-radius: 4px;
+      margin: 0 0 0.4rem;
+    }
+    footer { font-size: 0.85rem; color: var(--muted); margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero" id="inicio">
+      <p class="kicker">Documentación de equipo</p>
+      <h1>Reglas permanentes para agentes de IA</h1>
+      <p class="lede">Índice de una pantalla. El manual largo sigue en el otro HTML; los prompts para pegar, en Markdown.</p>
+      <p class="meta">Septiembre 2026 · No describe un producto de cliente ni un portfolio concreto.</p>
+    </header>
+
+    <aside class="puntos-clave" id="puntos-clave" aria-label="Puntos clave">
+      <p class="kicker-clave">Para quien recibe el HTML</p>
+      <h2>Puntos clave</h2>
+      <ol>
+        <li>No hace falta leerlo entero.</li>
+        <li>Reglas del equipo en Git: <code>AGENTS.md</code> o <code>CLAUDE.md</code> según la herramienta, corto, no en el chat.</li>
+        <li>Chat nuevo si cambiaste el MD o el hilo está inflado.</li>
+        <li>Arquitectura: modelo que razona. Ticket chico: modelo rápido.</li>
+        <li>Cuidá tokens: no dupliques reglas, no pegues el repo.</li>
+        <li>Prompts para pegar: <a href="casos/prompts-base.md"><code>casos/prompts-base.md</code></a>.</li>
+        <li>Legacy: no reescribir. Nuevo: mapa de carpetas el día 0. <a href="casos-practicos-legacy-y-nuevos.html">Fichas</a>.</li>
+        <li>Si choca con el producto, gana el enlace oficial. <a href="guia-agentes-reglas-y-modelos.html#referencias">Referencias</a>.</li>
+      </ol>
+    </aside>
+
+    <section class="hub" id="hub" aria-label="Portada">
+      <p class="hub-one-liner">Empezá por un click.</p>
+      <h2>Cada tarjeta lleva el número de arriba</h2>
+      <div class="hub-grid">
+        <a class="hub-card hub-start" href="guia-agentes-reglas-y-modelos.html#como-usar">
+          <span class="badge-clave">Claves 1 · 3</span>
+          <h3>Empezar en 5 min</h3>
+          <p>Atajo por rol: lead, React, Java o quién elige el modelo.</p>
+        </a>
+        <a class="hub-card hub-prompts" href="casos/prompts-base.md">
+          <span class="badge-clave">Clave 6</span>
+          <h3>Prompts para pegar</h3>
+          <p>24 plantillas (React, Java, Angular, Android) para el chat de hoy. Abrilo en el editor o en GitHub.</p>
+          <span class="hub-note">El navegador suele mostrarlo como texto crudo, no como capítulo.</span>
+        </a>
+        <a class="hub-card hub-casos" href="guia-agentes-reglas-y-modelos.html#trabajo-real">
+          <h3>React / Java en el manual</h3>
+          <p>Bugs, features y capas dentro de la enciclopedia. Para enviar: las dos tarjetas de abajo.</p>
+        </a>
+        <a class="hub-card hub-model" href="guia-agentes-reglas-y-modelos.html#modelos">
+          <span class="badge-clave">Claves 4 · 5</span>
+          <h3>Modelos y tokens</h3>
+          <p>Rápido vs. pensar, y cómo no gastar contexto en MD duplicado o hilos eternos.</p>
+        </a>
+        <a class="hub-card hub-equipo" href="guia-agentes-reglas-y-modelos.html#equipo">
+          <span class="badge-clave">Clave 2</span>
+          <h3>Equipo y Git</h3>
+          <p>Una fuente de verdad en el repo. El PR de reglas viaja con el código.</p>
+        </a>
+        <a class="hub-card hub-refs" href="guia-agentes-reglas-y-modelos.html#referencias">
+          <span class="badge-clave">Clave 8</span>
+          <h3>Referencias</h3>
+          <p>Enlaces oficiales. Si el producto cambia, vale la página del proveedor.</p>
+        </a>
+        <a class="hub-card hub-legacy" href="casos-practicos-legacy-y-nuevos.html#legacy">
+          <span class="badge-clave">Clave 7</span>
+          <h3>Casos: código legacy</h3>
+          <p>Bug, endpoint, monolito, Angular, Android. Tocá poco; no reescribas el módulo.</p>
+        </a>
+        <a class="hub-card hub-nuevo" href="casos-practicos-legacy-y-nuevos.html#nuevo">
+          <span class="badge-clave">Clave 7</span>
+          <h3>Casos: proyecto nuevo</h3>
+          <p>Día 0, tajada vertical, un stack, CI. El mapa va antes que la feature.</p>
+        </a>
+      </div>
+      <p class="hub-share">Manual completo (capítulos plegados): <a href="guia-agentes-reglas-y-modelos.html">guia-agentes-reglas-y-modelos.html</a>. Tokens: <a href="guia-agentes-reglas-y-modelos.html#cuidar-tokens">#cuidar-tokens</a>. Fichas para enviar: <a href="casos-practicos-legacy-y-nuevos.html">casos-practicos-legacy-y-nuevos.html</a>.</p>
+    </section>
+
+    <footer>
+      <p>Índice general: <a href="README.md">README.md</a>. Nota de envío: <a href="LEEME-PARA-ENVIAR.md">LEEME-PARA-ENVIAR.md</a>. Última redacción: septiembre 2026.</p>
+    </footer>
+  </div>
+</body>
+</html>
