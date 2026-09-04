@@ -19,6 +19,14 @@ Complementan las [fichas cortas](README.md) (qué poner en el MD) y la [guía HT
 | [R4](#r4-no-agrandar-el-alcance) | React: no agrandar alcance | Rápido |
 | [R5](#r5-tests-vitest--testing-library) | React: tests | Rápido |
 | [R6](#r6-review-de-un-pr-generado-por-agente) | React: review de PR de agente | Pensar |
+| [R7](#r7-useeffect-en-loop--closure-vieja) | React: useEffect en loop / closure vieja | Rápido |
+| [R8](#r8-campo-extra-en-un-formulario-existente) | React: campo extra en un form existente | Rápido |
+| [R9](#r9-no-migrar-class-components-a-hooks) | React: no migrar class a hooks | Rápido (pensar si el PR ya migró) |
+| [R10](#r10-no-introducir-reduxzustand) | React: no meter Redux/Zustand | Rápido |
+| [R11](#r11-ruta-nueva-mismo-patrón-de-react-router) | React: ruta nueva, mismo patrón | Rápido |
+| [R12](#r12-vite--react-día-0--una-página--fetch) | React: Vite día 0 + una página + fetch | Pensar (mapa), luego rápido |
+| [R13](#r13-no-mezclar-next-app-router-con-vite) | React: no mezclar Next App Router con Vite | Pensar (review) o rápido (parar) |
+| [R14](#r14-un-test-de-componente-sin-cypress) | React: un test de componente, no Cypress | Rápido |
 | [J1](#j1-endpoint-nuevo-en-capas) | Java: endpoint en capas | Rápido |
 | [J2](#j2-legacy-sin-microservicios) | Java: legacy, un deploy | Rápido + pensar si propone split |
 | [J3](#j3-el-controller-no-habla-con-la-base) | Java: controller ≠ DB | Pensar (review) o rápido (mover) |
@@ -38,7 +46,7 @@ Complementan las [fichas cortas](README.md) (qué poner en el MD) y la [guía HT
 | [T7](#t7-el-agente-hizo-commit-o-push) | Hizo commit / push | Humano; el chat no “deshace” Git |
 | [T8](#t8-pairing-plan-con-opus-implementar-con-composer) | Plan (Opus) → implementar (Composer) | Pensar, luego rápido |
 
-**Conteo:** 24 plantillas de situación (cada una con prompt + variante), más 5 snippets de sistema. Los nombres de modelos y de menús **caducan**; la lógica de cada ficha no.
+**Conteo:** 32 plantillas de situación (cada una con prompt + variante), más 5 snippets de sistema. Los nombres de modelos y de menús **caducan**; la lógica de cada ficha no.
 
 ---
 
@@ -416,6 +424,415 @@ implementación aparte). Solo veredicto y lista de recortes.
 
 ---
 
+### R7. useEffect en loop / closure vieja
+
+**Cuándo usarlo.** Un componente que ya está en producción refetch en círculo, o un click/reintento ve el filtro de hace tres renders. El `useEffect` existe. El contrato HTTP no cambia. No es “pasalo a React Query”.
+
+**Modelo sugerido.** **Rápido** (Composer, Grok, Haiku). **Pensar** solo si el estado vive en tres padres y hay que elegir dueño — igual no inventes store.
+
+**Contexto que debe existir.** `AGENTS.md` (o anidado de front): mapa `src/pages/`, `src/components/`, `src/api/`; no ampliar alcance. Workspace en la raíz. Chat nuevo. Ficha práctica: [LR1](../casos-practicos-legacy-y-nuevos.html#l-r-1).
+
+**Prompt listo para pegar**
+
+```text
+Bug de efecto. No rediseñes. No React Query.
+
+Síntoma: [OrderList refetch en loop al montar o al cambiar filtro /
+el botón Reintentar usa el filtro de hace tres renders.]
+
+Componente que ya existe (no crees otro): [src/pages/OrderList.tsx].
+Cliente HTTP: el que YA usa la lista [src/api/ordersApi.ts]. No lo reescribas.
+
+Reglas de este repo (ya están en AGENTS.md; no las reescribas):
+- Tocá solo ese componente y el spec si existe.
+- Arreglá deps, identidad del objeto/array, o leé el filtro actual
+  en el handler. No metas un store. No extraigas un hook genérico
+  de tres pantallas.
+- No eslint-disable de react-hooks/exhaustive-deps como único cambio.
+- No login, no admin, no librerías nuevas, no cambies el contrato HTTP.
+
+DoD:
+1. Un cambio de filtro dispara un fetch (o el que el vecino ya haga), no un loop.
+2. Reintentar / el click usa el filtro actual.
+3. Diff acotado: mismo componente, mismo cliente, mismo rol.
+4. Spec tocado en rojo-al-principio / verde-al-final si había spec.
+5. No commit / no push.
+
+Leé el efecto antes de editar. Si el estado vive en tres padres, parás
+y preguntás quién es el dueño; no inventés un store.
+```
+
+**Variante si el agente se desvía** (React Query, Zustand, `eslint-disable`, hook genérico)
+
+```text
+Pará. Estás agrandando el ticket.
+
+Revertí React Query, store, hooks nuevos y el eslint-disable de deps.
+El arreglo es: deps estables o leer el filtro actual en el handler
+que YA existe. Listá los archivos (máximo el componente y el spec)
+y esperá un OK de una línea antes de seguir editando.
+```
+
+**Qué NO pedir en ese prompt.** “Pasalo a React Query”, “aprovechá y extraé un hook de data fetching”, “mejorá la UX”, pegar el repo entero, commit.
+
+**DoD.** El loop se corta o el handler deja de ver estado viejo. Mismo componente, mismo cliente HTTP. Sin store ni lib nueva. Spec de la lista (si había) cubre la regresión.
+
+---
+
+### R8. Campo extra en un formulario existente
+
+**Cuándo usarlo.** Un form que ya está en producción (contacto, alta de pedido). Ticket: un input más (`phone`, `notes`). Misma validación, mismo submit. El POST ya acepta la clave, o el ticket lo dice. No es auth ni un form nuevo.
+
+**Modelo sugerido.** **Rápido** si el campo vecino está nombrado. **Pensar** si propone React Hook Form, Zod de cero, o login.
+
+**Contexto que debe existir.** MD: UI no pega URLs; HTTP en `src/api/`; “solo lo que el ticket nombra”; no auth. Ficha práctica: [LR2](../casos-practicos-legacy-y-nuevos.html#l-r-2).
+
+**Prompt listo para pegar**
+
+```text
+Campo extra en el formulario que YA existe. No reescribas el form.
+
+Form: [src/components/ContactForm.tsx].
+Campo nuevo: [phone / notes].
+Campo vecino a copiar (markup + validación): [email / dueDate].
+Submit: el mismo handler y el mismo cliente HTTP
+[src/api/contactApi.ts / el que ya use el form].
+
+Reglas:
+- Un input más. Misma validación local que el vecino (required, max length).
+- Si el POST ya acepta la clave, mandala en el mismo payload. Si no está
+  en el contrato, pará y preguntá; no inventes el back.
+- No login, OAuth, captcha, wizard, ni “lo dejo preparado”.
+- No instales React Hook Form, Formik ni Zod si el form no los usa.
+- Si existe spec del form, agregá un caso del campo nuevo ahí.
+  No armes una suite nueva.
+
+DoD:
+1. El campo se ve, valida como el vecino y viaja en el mismo submit.
+2. Diff: form + cliente solo si hace falta la clave + spec si existía.
+3. Grep sin LoginPage, sin lib de forms nueva.
+4. No commit / no push.
+
+Listá archivos y esperá OK de una línea antes de editar.
+```
+
+**Variante si el agente se desvía** (RHF, login, segundo form)
+
+```text
+Pará. Sacá React Hook Form, Zod, login y el segundo formulario.
+Dejá el form que ya existía con UN campo más, copiado del vecino
+[email / dueDate]. Mismo submit. Listá files y parás.
+```
+
+**Qué NO pedir.** “Dejalo production-ready”, “y de paso el login”, “pasalo a RHF”, inventar el contrato del POST, commit.
+
+**DoD.** El campo nuevo se demo en el flujo que ya está. Cero auth. Cero lib de forms nueva. Spec extendido si existía.
+
+---
+
+### R9. No migrar class components a hooks
+
+**Cuándo usarlo.** El archivo es un class component. El ticket es un badge, un texto, una prop. El agente quiere `function` + hooks “de paso”. El backlog no pide migración.
+
+**Modelo sugerido.** **Rápido** para el parche. **Pensar** (review, chat nuevo) si el PR ya convirtió el archivo.
+
+**Contexto que debe existir.** MD: “no convertir class→función ni reescribir UI toolkit de paso”. Ficha práctica: [LR3](../casos-practicos-legacy-y-nuevos.html#l-r-3).
+
+**Prompt listo para pegar**
+
+```text
+Cambio en una class que YA existe. No la pases a hooks.
+
+Archivo: [src/components/UserCard.jsx].
+Ticket: [badge de estado / una prop / el síntoma].
+
+Reglas:
+- Dejá class, lifecycle (componentDidMount / etc.) y this.state.
+- No uses useState, useEffect ni extraigas hooks en ESTE componente.
+- No reescribas el render a un árbol nuevo “equivalente”.
+- Si el spec monta la class, extendé ese archivo. No lo reescribas
+  a Testing Library "moderna" ni migres Enzyme de paso.
+- No login, no store, no librería.
+
+DoD:
+1. El badge o la prop se ve en el flujo que ya está.
+2. El archivo sigue siendo class Component / PureComponent.
+3. Grep del archivo sin useState/useEffect nuevos.
+4. No commit / no push.
+
+Listá archivos (máximo la class y el spec) y esperá OK de una línea.
+```
+
+**Variante si el agente se desvía** (ya empezó `function UserCard`)
+
+```text
+Pará. Devolvé el componente a class. El ticket no es una migración.
+Sacá useState, useEffect y el rewrite del render.
+Aplicá solo [el badge / la prop] sobre la class original.
+Si no podés deshacer en este hilo, decilo en una frase: abro chat nuevo.
+```
+
+**Qué NO pedir.** “Modernizalo”, “pasalo a hooks que es más simple”, “aprovechá y extraé un hook”, commit.
+
+**DoD.** El cambio se ve. El archivo sigue siendo class. Cero migración. Spec extendido, no reescrito.
+
+---
+
+### R10. No introducir Redux/Zustand
+
+**Cuándo usarlo.** El tema, el carrito o el filtro ya viven en `React.createContext` o en `useState` del padre. El ticket es un toggle, un chip, un valor más. El agente instala Zustand o Redux Toolkit.
+
+**Modelo sugerido.** **Rápido**, límites en el primer mensaje. Si el PR ya metió el store: recortar, no discutir arquitectura.
+
+**Contexto que debe existir.** MD: “no Redux/Zustand/Jotai si el disco no los tiene”. Ficha práctica: [LR4](../casos-practicos-legacy-y-nuevos.html#l-r-4).
+
+**Prompt listo para pegar**
+
+```text
+Estado que YA existe. No instales store.
+
+Dueño actual: [ThemeContext / CartContext / el useState de OrderList].
+Ticket: [toggle dark / un filtro más / un valor en el carrito].
+
+Reglas:
+- Extendé ese Context o ese state. Mismos providers, mismos archivos.
+- Prohibido: zustand, @reduxjs/toolkit, redux, jotai, recoil,
+  src/store/, un Provider nuevo, una lib de estado.
+- Si "el Context no escala" te parece un problema, una frase al final
+  y esperás. No lo codees.
+- No login, no admin, no router nuevo.
+
+DoD:
+1. El cambio usa el Context o el useState existente.
+2. package.json sin store nuevo.
+3. Grep sin src/store/, createSlice ni create() de zustand.
+4. No commit / no push.
+
+Listá archivos y esperá OK de una línea antes de editar.
+```
+
+**Variante si el agente se desvía** (instaló Zustand / creó `src/store/`)
+
+```text
+Pará. Desinstalá zustand/redux/jotai de este diff.
+Borrá src/store/ y el hook use*Store.
+El toggle/filtro vive en [ThemeContext / el state del padre].
+Mostrá el diff recortado a esos archivos y listo.
+```
+
+**Qué NO pedir.** “Mejorá el estado”, “un store de verdad”, “Redux porque después va a hacer falta”, commit.
+
+**DoD.** El cambio se demo con el dueño de estado que ya estaba. Cero dependencia de store. Cero carpeta `store/`.
+
+---
+
+### R11. Ruta nueva, mismo patrón de React Router
+
+**Cuándo usarlo.** React Router ya está cableado (`<Routes>`/`<Route>` o `createBrowserRouter`). Ticket: una URL más (`/orders/:id`). Hay una ruta hermana. Nadie pidió data APIs, loaders, ni migrar de v5 a v6.
+
+**Modelo sugerido.** **Rápido** si la vecina está nombrada. **Pensar** si propone cambiar de `Routes` a `createBrowserRouter` (o al revés).
+
+**Contexto que debe existir.** MD: rutas donde el disco ya las declara; HTTP en `src/api/`; no Next `app/`. Ficha práctica: [LR5](../casos-practicos-legacy-y-nuevos.html#l-r-5).
+
+**Prompt listo para pegar**
+
+```text
+Ruta nueva, mismo patrón que las que YA hay. No migres el router.
+
+Archivo de rutas: [src/App.tsx / src/routes.tsx].
+Ruta vecina a copiar: [/orders → OrderList / /customers/:id → CustomerDetail].
+Ruta nueva: [/orders/:id → OrderDetail].
+Página: [src/pages/OrderDetail.tsx] (o la carpeta de páginas del disco).
+HTTP: [src/api/ordersApi.ts]. El GET de detalle [ya existe / se mockea
+en el api module]. No inventes el back.
+
+Reglas:
+- Mismo helper de Router que el resto (Routes/Route o createBrowserRouter).
+  No pases de uno al otro en este ticket.
+- No loaders, no actions, no data APIs, si el disco no las usa.
+- No app/ de Next, no next/link, no 'use client'.
+- El componente no pega fetch ni hardcodea la URL.
+- No login, no rutas protegidas, no librería de router nueva.
+
+DoD:
+1. La URL nueva abre la página del mapa.
+2. Misma API de Router que las rutas hermanas.
+3. HTTP solo en src/api/.
+4. No commit / no push.
+
+Listá archivos (rutas + página + api si hace falta el GET) y esperá OK.
+```
+
+**Variante si el agente se desvía** (migra el router, loader, `app/`)
+
+```text
+Pará. No migres a createBrowserRouter / no agregues loaders.
+Sacá app/, next/link y el fetch del componente.
+La ruta nueva copia [la vecina nombrada] en [el archivo de rutas].
+HTTP en [ordersApi.ts]. Listá files y parás.
+```
+
+**Qué NO pedir.** “Actualizá React Router”, “pasalo a data router”, “y de paso el login del detalle”, mezclar Next, commit.
+
+**DoD.** La URL funciona como las hermanas. Cero migración de router. Cero `app/` de Next. Cliente HTTP intacto en `src/api/`.
+
+---
+
+### R12. Vite + React día 0 + una página + fetch
+
+**Cuándo usarlo.** Scaffold Vite + React (o repo que va a ser eso). La API **ya** existe en otro deploy. Primero el mapa (`AGENTS.md`). Después, chat nuevo: una página que lista un GET nombrado. No Next. No auth. No el producto entero.
+
+**Modelo sugerido.** Mapa: **pensar** (¿raíz vs. anidado?). Página: **rápido** con paths ya escritos. Dos chats. No un solo Auto.
+
+**Contexto que debe existir.** Workspace en la raíz. Chat 1 crea el MD; chat 2 (nuevo, T2) implementa. Ficha práctica: [NR1](../casos-practicos-legacy-y-nuevos.html#n-r-1). Snippets: [S1–S4](#qué-va-en-agentsmd-y-qué-va-en-el-chat) (decí React + Vite, no Angular).
+
+**Prompt listo para pegar**
+
+```text
+Chat 1 — Día 0. Solo AGENTS.md (y anidado frontend/ si el repo es mixto).
+No implementes producto.
+
+Este front es React + Vite. Uno solo. No Next, no app/, no Angular.
+Escribí el mapa del disco que VAMOS a usar:
+- src/pages/ — pantallas
+- src/components/ — UI
+- src/api/ — HTTP
+Quién habla con quién: el JSX no pega fetch ni URLs.
+Tests: [npm test / npx vitest] si el scaffold ya los tiene.
+No commit si no lo pido. Listá paths creados y pará.
+La primera pantalla es OTRO chat.
+
+---
+
+Chat 2 — Chat NUEVO. Una tajada. El mapa ya está en Git.
+
+Pantalla: [OrderList en src/pages/OrderList.tsx].
+GET que YA existe: [GET /api/orders — URL base en [VITE_API_URL / la env
+que el scaffold ya lea]]. No implementes el backend.
+Cliente: [src/api/ordersApi.ts]. El componente no pega fetch ni hardcodea
+la URL. Sin login, JWT, middleware, ni segundo recurso.
+Si el GET exige token en prod, usá el mock/header que el MD nombre, o preguntá.
+
+DoD:
+1. La lista se ve con el DTO del GET nombrado (o vacío/error del cliente).
+2. Grep sin LoginPage, next-auth, fetch/axios en el JSX, app/ de Next.
+3. Sin archivos fuera del mapa.
+4. No commit / no push.
+```
+
+**Variante si el agente se desvía** (Next, auth, `fetch` en el JSX, producto entero)
+
+```text
+Pará. Este repo es Vite + React, no Next.
+Sacá app/, LoginPage, y el fetch del componente.
+Chat 1 = solo MD. Chat 2 = una página + src/api/ contra el GET nombrado.
+Nada más. Listá files y parás.
+```
+
+**Qué NO pedir.** “Dejalo production-ready”, “y de paso el login”, mezclar A2/R2 en un solo chat Auto, inventar el DTO, commit.
+
+**DoD.** MD con “React + Vite, no Next”. Una página usa `src/api/` contra el GET existente. Cero auth. Cero `app/`. Dos chats.
+
+---
+
+### R13. No mezclar Next App Router con Vite
+
+**Cuándo usarlo.** El disco es Vite + React (SPA) y el agente (o un PR) trajo `app/page.tsx`, `'use client'`, Server Actions o `next/link`. O el inverso: el repo es Next y alguien arma `src/pages/` de CRA/Vite. No es N3 (eso es React vs Angular).
+
+**Modelo sugerido.** **Rápido** para escribir la línea en el MD. **Pensar** (review, chat nuevo) si el árbol ya se mezcló. El parche de vuelta: **rápido**, con la lista a restaurar.
+
+**Contexto que debe existir.** El framework del disco está (o se escribe ahora) en el MD. Ficha práctica: [NR2](../casos-practicos-legacy-y-nuevos.html#n-r-2).
+
+**Prompt listo para pegar**
+
+```text
+Review de stack. Este front es Vite + React (SPA). No Next.
+
+El mapa sagrado es el del disco (AGENTS.md):
+- src/pages/, src/components/, src/api/
+- Rutas: React Router en [src/App.tsx / src/routes.tsx]
+- Prohibido: app/, page.tsx de App Router, layout.tsx de Next,
+  'use client', Server Actions, next/link, next/navigation,
+  next/image, middleware.ts de Next.
+
+Hacé solo esto:
+1. Listá cada archivo de Next o con 'use client' / next/*.
+   Path actual vs. path que debería tener en el Vite SPA.
+2. Para cada uno: ¿hace falta para el ticket original? sí/no.
+3. No instales next. No "dejes app/ porque ya compila".
+4. Si solo faltaba la línea en el MD: escribí 4–6 líneas y pará.
+   Feature en chat nuevo (T2).
+
+Si el repo FUERA Next (app/), el inverso: no armes src/pages/ de Vite
+ni React Router en paralelo. Un router. Un framework.
+
+Salida: lista con paths. Cero producto nuevo en este chat. No commit.
+```
+
+**Variante si el agente se desvía** (sigue creando `app/` o instala `next`)
+
+```text
+Chat de review, no de migración a Next.
+No instales next. Borrá app/, 'use client' y next/link de este diff.
+Devolvé el código al mapa Vite (pages / components / api / React Router).
+Si no podés deshacer en este hilo, decilo en una frase.
+```
+
+**Qué NO pedir.** “Dejalo listo para cuando pasemos a Next”, implementar la migración en el mismo prompt de review, mezclar A3 (eso es Angular).
+
+**DoD.** El MD nombra Vite SPA y prohíbe Next. `package.json` sin `next`. Cero `app/**/page.tsx` en el PR del ticket. Si el repo es Next, cero árbol Vite paralelo.
+
+---
+
+### R14. Un test de componente, sin Cypress
+
+**Cuándo usarlo.** Greenfield Vite + React. Hay que cubrir un comportamiento de la primera UI. El runner del scaffold es Vitest + Testing Library (o el que el disco ya tenga). No es “agregar Cypress al monorepo”. Para un módulo viejo usá R5.
+
+**Modelo sugerido.** **Rápido**. El spec copia el estilo Vite/RTL. **Pensar** solo si hay que elegir unit vs. e2e — y igual no instales Cypress “de paso”.
+
+**Contexto que debe existir.** Comando de test en el MD (`npm test` / `npx vitest`). Ficha práctica: [NR3](../casos-practicos-legacy-y-nuevos.html#n-r-3).
+
+**Prompt listo para pegar**
+
+```text
+Un test de componente. No una suite e2e.
+
+Componente: [src/components/ContactForm.tsx / src/pages/OrderList.tsx].
+Caso a cubrir: [al submit, se envía phone / la lista vacía muestra
+el estado vacío. / el comportamiento del ticket].
+
+Dónde:
+- Un archivo junto al componente, mismo patrón que el scaffold
+  (Vitest + Testing Library): [ContactForm.test.tsx].
+- No carpeta cypress/, e2e/, ni __tests__ nueva si el repo no la usa.
+
+Reglas:
+- Simulá lo que el usuario hace (click, change), no los internals.
+- Mockeá el cliente HTTP solo si hace falta para el caso; no mockees
+  el mundo entero.
+- No instales Cypress, Playwright ni Jest si el runner es Vitest.
+- No reescribas tests verdes. Corré solo ese spec (npx vitest path).
+- Mostrá comando y salida. No afirmes verde si no corriste.
+
+DoD: el caso nuevo falla sin el comportamiento y pasa con él
+(o queda rojo si revertís el fix). Un spec. Cero infra e2e.
+No commit.
+```
+
+**Variante si el agente se desvía** (Cypress, Playwright, carpeta e2e)
+
+```text
+No. Un spec junto al componente, Vitest + Testing Library.
+Sacá cypress.config, playwright.config, la carpeta e2e/ y Jest.
+Pegá el test que cubre [el síntoma] y corré ese archivo.
+```
+
+**Qué NO pedir.** Coverage 100 %, e2e del producto, “un SPA serio tiene Cypress”, cambiar Vite para los tests, commit.
+
+**DoD.** Un spec alineado al scaffold. Comando corrido. `package.json` sin Cypress/Playwright. Cero carpeta e2e nueva.
+
+---
+
 ## Java / Spring
 
 ### J1. Endpoint nuevo en capas
@@ -661,7 +1078,7 @@ no es merge. Listá recortes. Yo aplico o abro otro chat.
 
 ## Angular
 
-No uses R1–R6 “cambiando React por Angular”. Esas fichas hablan de `src/pages/`, `src/api/` y `fetch` en el JSX. Acá el disco es `src/app/`, NgModule o carpeta feature, servicio/fachada. Si el agente trae hooks o `src/features/` de tutorial React, paramos: [A3](#a3-angular-no-mezclar-patrones-react).
+No uses R1–R14 “cambiando React por Angular”. Esas fichas hablan de `src/pages/`, `src/api/` y `fetch` en el JSX. Acá el disco es `src/app/`, NgModule o carpeta feature, servicio/fachada. Si el agente trae hooks o `src/features/` de tutorial React, paramos: [A3](#a3-angular-no-mezclar-patrones-react).
 
 ### A1. Angular: cambio en el módulo que ya existe
 
@@ -1312,6 +1729,14 @@ que estaba”.
 | R1, R4, R5 | [react-bug-acotado.md](react-bug-acotado.md) |
 | R2 | [react-feature-capas.md](react-feature-capas.md) |
 | R3 | [react-arquitectura.md](react-arquitectura.md) |
+| R7 | [casos-practicos LR1](../casos-practicos-legacy-y-nuevos.html#l-r-1) (HTML práctico; no hay ficha .md aparte) |
+| R8 | [casos-practicos LR2](../casos-practicos-legacy-y-nuevos.html#l-r-2) |
+| R9 | [casos-practicos LR3](../casos-practicos-legacy-y-nuevos.html#l-r-3) |
+| R10 | [casos-practicos LR4](../casos-practicos-legacy-y-nuevos.html#l-r-4) |
+| R11 | [casos-practicos LR5](../casos-practicos-legacy-y-nuevos.html#l-r-5) |
+| R12 | [casos-practicos NR1](../casos-practicos-legacy-y-nuevos.html#n-r-1) |
+| R13 | [casos-practicos NR2](../casos-practicos-legacy-y-nuevos.html#n-r-2) |
+| R14 | [casos-practicos NR3](../casos-practicos-legacy-y-nuevos.html#n-r-3) |
 | J1, J4 | [java-spring-endpoint.md](java-spring-endpoint.md) |
 | J2 | [java-spring-legacy.md](java-spring-legacy.md) |
 | J3 | [java-spring-capa.md](java-spring-capa.md) |

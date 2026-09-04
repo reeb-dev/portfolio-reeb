@@ -342,6 +342,11 @@
             <li><a href="#l7">Cambio SMTP / ops en Java existente</a></li>
             <li><a href="#l8">Angular: cambio en módulo existente</a></li>
             <li><a href="#l9">Android: mismo patrón, no reescribir</a></li>
+            <li><a href="#l-r-1">React: loop de useEffect / closure vieja</a></li>
+            <li><a href="#l-r-2">React: campo extra en un form que ya existe</a></li>
+            <li><a href="#l-r-3">React: no migrar class a hooks</a></li>
+            <li><a href="#l-r-4">React: no meter Redux/Zustand</a></li>
+            <li><a href="#l-r-5">React: ruta nueva, mismo patrón</a></li>
           </ol>
         </div>
         <div class="hub-col nuevo">
@@ -357,6 +362,9 @@
             <li><a href="#n6">Review de arquitectura una vez</a></li>
             <li><a href="#n7">Primera feature sin inventar auth</a></li>
             <li><a href="#n8">Angular: día 0 + tajada vertical</a></li>
+            <li><a href="#n-r-1">React Vite: día 0 + una página + fetch</a></li>
+            <li><a href="#n-r-2">React: no mezclar App Router de Next</a></li>
+            <li><a href="#n-r-3">React: un test de componente, no Cypress</a></li>
           </ol>
         </div>
       </div>
@@ -365,7 +373,7 @@
 
     <section class="chapter chapter-legacy" id="legacy">
       <p class="chap-label">Código que ya está</p>
-      <h2>Legacy (9 casos)</h2>
+      <h2>Legacy (14 casos)</h2>
       <div class="callout-clave">
         <p><strong>Importante</strong> — clave 7: no reescribir. Lista: <a href="#puntos-clave">Puntos clave</a>.</p>
       </div>
@@ -782,11 +790,246 @@ Listá archivos (máximo los del paquete) y esperá OK de una línea.</code></pr
           <p class="ver-mas">Ver más: <a href="#l4">L4</a> · <a href="guia-agentes-reglas-y-modelos.html#arquitectura">#arquitectura</a> (MVVM) · <a href="casos/prompts-base.md#d1-android-mismo-patrón-que-el-vecino">D1</a> / <a href="casos/prompts-base.md#d2-android-no-reescribir-la-arquitectura">D2</a>.</p>
         </article>
       </details>
+
+      <details class="fold" id="l-r-1">
+        <summary><h3>LR1 · Loop de useEffect / closure vieja, sin reescribir la app</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-react">React</span>
+          <h4>El efecto se dispara en círculo, o el click ve el filtro de hace tres renders.</h4>
+          <p class="lab">Contexto</p>
+          <p>Lista de pedidos en producción. <code>OrderList</code> ya existe. Al montar (o al cambiar un filtro) el <code>useEffect</code> vuelve a pedir la lista en loop: depende de un objeto/array creado en cada render, o el <code>setState</code> del efecto entra en las deps. Variante: el botón “Reintentar” usa un handler que cierra sobre el filtro viejo. No hay ticket de React Query, de extraer un hook genérico ni de rediseñar el estado.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> nuevo. Un síntoma (loop o dato viejo). Nombrá el componente y, si lo viste, el efecto. No el hilo del filtro de ayer.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span>. <span class="pill pill-think">pensar</span> solo si el estado vive en tres padres y hay que elegir dueño — igual no inventes store.</li>
+            <li><strong>AGENTS.md:</strong> mapa <code>src/pages/</code>, <code>src/components/</code>, <code>src/api/</code>; “solo lo que el ticket nombra”; no store; HTTP sigue en el cliente que ya usa la lista.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#r7-useeffect-en-loop--closure-vieja">prompts-base R7</a>. Corto:</p>
+          <pre><code>Bug de efecto. No rediseñes. No React Query.
+
+Síntoma: [OrderList refetch en loop / Reintentar usa el filtro viejo].
+Componente: [src/pages/OrderList.tsx]. Cliente HTTP: el que YA usa la lista.
+Arreglá deps, identidad del objeto, o leé el filtro actual. Sin store nuevo.
+Tocá ese archivo y el spec si existe. Sin login ni hook genérico.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Diff de un componente que el equipo ya debuguea.</li>
+                <li>El rápido alcanza si el síntoma y el path están nombrados.</li>
+                <li>No cambia el contrato HTTP ni el árbol.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Sin acotar, “arregla” el efecto metiendo React Query.</li>
+                <li>Opus propone un hook compartido de tres pantallas.</li>
+                <li>Un <code>eslint-disable</code> de deps esconde el loop, no lo cierra.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Un cambio de filtro dispara <em>un</em> fetch (o el que el vecino ya haga). “Reintentar” usa el filtro actual. Mismo componente, mismo cliente. Spec tocado si existía. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> React Query “para los efectos”, Zustand, o <code>eslint-disable react-hooks/exhaustive-deps</code> como único cambio.</p></div>
+          <p class="ver-mas">Ver más: <a href="#l1">L1</a> · <a href="guia-agentes-reglas-y-modelos.html#tr-react-bug">#tr-react-bug</a> · <a href="casos/prompts-base.md#r7-useeffect-en-loop--closure-vieja">R7</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l-r-2">
+        <summary><h3>LR2 · Campo extra en un formulario que ya existe</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-react">React</span>
+          <h4>Un input más. Misma validación, mismo submit. No hay ticket de login.</h4>
+          <p class="lab">Contexto</p>
+          <p><code>ContactForm</code> (o el alta de pedido) ya está en producción: campos, validación local, submit al cliente HTTP que ya existe. Ticket: agregar <code>phone</code> o <code>notes</code>, mismo patrón que el campo vecino. El contrato del POST ya acepta esa clave, o el ticket dice que el back ya puede. Nadie pidió auth, React Hook Form, ni un wizard de tres pasos.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> nombrá el form y el campo vecino a copiar. “No inventes login.”</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> si el vecino es obvio. <span class="pill pill-think">pensar</span> si el agente propone otra lib de forms o un store.</li>
+            <li><strong>AGENTS.md:</strong> UI no pega URLs; HTTP en <code>src/api/</code>; “solo lo que el ticket nombra”; no auth ni admin.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#r8-campo-extra-en-un-formulario-existente">prompts-base R8</a>. Corto:</p>
+          <pre><code>Campo extra en el form que YA existe. No reescribas el form.
+
+Form: [src/components/ContactForm.tsx]. Campo nuevo: [phone / notes].
+Copiá validación y markup del campo vecino [email / dueDate].
+Mismo submit, mismo cliente HTTP. Sin login, sin React Hook Form,
+sin wizard. Spec del form si existe: un caso del campo nuevo.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El review compara el input nuevo con el de al lado.</li>
+                <li>Composer copia el patrón si el path está nombrado.</li>
+                <li>No se cuela un segundo estilo de validación.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Sin path, instala React Hook Form “porque es el default”.</li>
+                <li>“Dejalo production-ready” mete captcha y auth.</li>
+                <li>Si el POST no tiene la clave, el agente inventa el contrato.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El campo se ve, valida como el vecino y viaja en el mismo submit. Diff en el form + cliente si hace falta la clave + spec si existía. Cero auth. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>LoginModal</code>, Zod + RHF de cero, o un segundo formulario “más limpio” al lado del que ya funciona.</p></div>
+          <p class="ver-mas">Ver más: <a href="#l1">L1</a> · <a href="casos/prompts-base.md#r8-campo-extra-en-un-formulario-existente">R8</a> · ficha <a href="casos/react-bug-acotado.md">react-bug-acotado.md</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l-r-3">
+        <summary><h3>LR3 · No migrar class components a hooks si nadie lo pidió</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-react">React</span>
+          <h4>Un badge o una prop. La class se queda class.</h4>
+          <p class="lab">Contexto</p>
+          <p><code>UserCard</code> o <code>FilterPanel</code> es un class component de hace años. Ticket: un badge de estado, un texto, una prop más. El agente “aprovecha” y lo pasa a función + hooks, o reescribe <code>componentDidMount</code> a tres <code>useEffect</code>. El backlog no pide migración. Los tests del class, si hay, usan el API viejo.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> “es una class. Dejala class. Solo el badge/prop.” Si ya empezó la migración, chat <strong>nuevo</strong>, no negociar el rewrite.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> para el parche. <span class="pill pill-think">pensar</span> (review) si el PR ya convirtió el archivo.</li>
+            <li><strong>AGENTS.md:</strong> “no convertir class→función ni XML de UI de paso”; mapa de carpetas; solo lo que el ticket nombra.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#r9-no-migrar-class-components-a-hooks">prompts-base R9</a>. Corto:</p>
+          <pre><code>Cambio en una class que YA existe. No la pases a hooks.
+
+Archivo: [src/components/UserCard.jsx]. Ticket: [badge de estado / una prop].
+Dejá class, lifecycle y this.state. No useEffect, no extraer hooks.
+Si el spec monta la class, extendelo; no lo reescribas a Testing Library "moderna".</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El PR del badge cabe en una review de 10 minutos.</li>
+                <li>No se mezclan dos estilos en el mismo archivo “a medias”.</li>
+                <li>Los tests del class siguen significando lo mismo.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>El class sigue viejo; este ticket no lo limpia.</li>
+                <li>Un modelo capaz justifica “es más simple en hooks”.</li>
+                <li>Sin la frase “dejala class”, la migración entra sola.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El badge o la prop se ve. El archivo sigue siendo class. Cero <code>useState</code>/<code>useEffect</code> nuevos en ese componente. Spec extendido, no reescrito. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>function UserCard</code> + tres hooks “equivalentes”, o un PR de 200 líneas para un span.</p></div>
+          <p class="ver-mas">Ver más: <a href="#l3">L3</a> (no partir) · <a href="casos/prompts-base.md#r9-no-migrar-class-components-a-hooks">R9</a> · <a href="casos/react-arquitectura.md">react-arquitectura.md</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l-r-4">
+        <summary><h3>LR4 · No meter Redux/Zustand si ya hay Context o estado simple</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-react">React</span>
+          <h4>El tema, el carrito o el filtro ya tienen dueño. No un store “de verdad”.</h4>
+          <p class="lab">Contexto</p>
+          <p>El front ya guarda tema (o carrito, o filtros de la lista) en <code>React.createContext</code>, o la página usa <code>useState</code> en el padre. Ticket chico: un toggle, un chip, un valor más. El agente instala Zustand o Redux Toolkit “porque el Context no escala”. Nadie pidió store global ni una carpeta <code>src/store/</code>.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> nombrá el Context o el state del padre. “Extendé eso. No instales store.”</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span>. <span class="pill pill-think">pensar</span> solo para decir “no hace falta Redux” si el PR ya lo metió.</li>
+            <li><strong>AGENTS.md:</strong> “no Redux/Zustand/Jotai si el disco no los tiene”; estado en el Context o el padre que ya existe.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#r10-no-introducir-reduxzustand">prompts-base R10</a>. Corto:</p>
+          <pre><code>Estado que YA existe. No instales store.
+
+Dueño actual: [ThemeContext / el useState de OrderList].
+Ticket: [toggle dark / un filtro más].
+Extendé ese Context o ese state. Prohibido zustand, redux, jotai,
+src/store/, providers nuevos. Sin login.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Una línea “el disco no tiene store” corta el hábito del tutorial.</li>
+                <li>El review no aprueba un <code>package.json</code> de paso.</li>
+                <li>El toggle llega en el provider que QA ya conoce.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Si el Context ya está mal, el agente multiplica el atajo.</li>
+                <li>Un prompt vago (“mejorá el estado”) autoriza Redux.</li>
+                <li>Opus justifica el store con un blog de 2024.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El cambio usa el Context o el <code>useState</code> existente. <code>package.json</code> sin store nuevo. Cero <code>src/store/</code>. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>useThemeStore</code> de Zustand al lado de un <code>ThemeContext</code> que ya funcionaba.</p></div>
+          <p class="ver-mas">Ver más: <a href="#l1">L1</a> · <a href="casos/prompts-base.md#r10-no-introducir-reduxzustand">R10</a> · <a href="casos/prompts-base.md#r4-no-agrandar-el-alcance">R4</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="l-r-5">
+        <summary><h3>LR5 · React Router: una ruta más, igual que las que ya hay</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-legacy">
+          <span class="tag tag-legacy">Legacy</span>
+          <span class="tag tag-react">React</span>
+          <h4>Copiá la ruta hermana. No migres el router de paso.</h4>
+          <p class="lab">Contexto</p>
+          <p>SPA con React Router ya cableado: o <code>&lt;Routes&gt;</code>/<code>&lt;Route&gt;</code> en <code>App.tsx</code>, o <code>createBrowserRouter</code> en un archivo de rutas. Ticket: pantalla de detalle <code>/orders/:id</code> (o el path del equipo). Ya hay una lista en <code>/orders</code> y un vecino de detalle en otro recurso. Nadie pidió data APIs, loaders, ni pasar de v5 a v6 (ni al revés).</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> nombrá el archivo de rutas y la ruta vecina a copiar. “Mismo helper, mismo layout.”</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> si el vecino es obvio. <span class="pill pill-think">pensar</span> si propone <code>createBrowserRouter</code> en un repo que usa <code>Routes</code>.</li>
+            <li><strong>AGENTS.md:</strong> “rutas donde el disco ya las declara”; no Next <code>app/</code>; HTTP en <code>src/api/</code>, no en el loader si el equipo no usa loaders.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#r11-ruta-nueva-mismo-patrón-de-react-router">prompts-base R11</a>. Corto:</p>
+          <pre><code>Ruta nueva, mismo patrón que las que YA hay. No migres el router.
+
+Archivo de rutas: [src/App.tsx o src/routes.tsx].
+Vecina a copiar: [/orders → OrderList / /customers/:id].
+Nueva: [/orders/:id → OrderDetail]. Página en [src/pages/], HTTP en [src/api/].
+No createBrowserRouter si el disco usa Routes (ni al revés).
+No loaders, no Next app/, no auth. Listá files y esperá OK.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El review compara la ruta nueva con la hermana.</li>
+                <li>No se cuela un segundo estilo de router en el mismo SPA.</li>
+                <li>La página sigue el mapa de carpetas.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Sin path, el agente “actualiza” a data router el mismo PR.</li>
+                <li>Un detalle tienta a inventar auth “porque es ficha”.</li>
+                <li>Vite + <code>app/orders/[id]/page.tsx</code> es el mix de NR2.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>La URL nueva abre la página del mapa. Misma API de Router que el resto. Cero loaders/data APIs si el disco no los tiene. HTTP en <code>src/api/</code>. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> migrar todo a <code>createBrowserRouter</code> para una ruta, o un <code>loader</code> con <code>fetch</code> que saltea el api module.</p></div>
+          <p class="ver-mas">Ver más: <a href="#l4">L4</a> · <a href="casos/prompts-base.md#r11-ruta-nueva-mismo-patrón-de-react-router">R11</a> · <a href="#n-r-2">NR2</a>.</p>
+        </article>
+      </details>
     </section>
 
     <section class="chapter chapter-nuevo" id="nuevo">
       <p class="chap-label">Repo que todavía no tiene producto</p>
-      <h2>Proyectos nuevos (8 casos)</h2>
+      <h2>Proyectos nuevos (11 casos)</h2>
       <div class="callout-clave">
         <p><strong>Importante</strong> — clave 7: mapa de carpetas el día 0. Lista: <a href="#puntos-clave">Puntos clave</a>.</p>
       </div>
@@ -1165,10 +1408,155 @@ No commit.</code></pre>
           <p class="ver-mas">Ver más: <a href="#n1">N1</a> · <a href="#n2">N2</a> · <a href="#n3">N3</a> · <a href="casos/prompts-base.md#a2-angular-día-0--tajada-vertical">A2</a> / <a href="casos/prompts-base.md#a3-angular-no-mezclar-patrones-react">A3</a> / S1.</p>
         </article>
       </details>
+
+      <details class="fold" id="n-r-1">
+        <summary><h3>NR1 · Vite + React día 0: AGENTS + una página + fetch a la API que ya está</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <h4>Mapa primero. Después una lista. El GET ya existe; no inventes el back.</h4>
+          <p class="lab">Contexto</p>
+          <p>Scaffold Vite + React (o repo vacío que va a ser eso). La API ya vive en otro deploy: <code>GET /api/orders</code> (o el path acordado) ya responde DTO. El día 0 escribe <code>AGENTS.md</code>. El chat <strong>siguiente</strong> arma <code>OrderList</code> + cliente en <code>src/api/</code>. No Next, no auth, no segundo recurso “para que quede redondo”.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat 1:</strong> solo reglas. “SPA React + Vite. No Next, no <code>app/</code>.” Workspace en la raíz.</li>
+            <li><strong>Chat 2 nuevo:</strong> una página + el cliente HTTP. El GET no se implementa acá.</li>
+            <li><strong>Modelo:</strong> mapa <span class="pill pill-think">pensar</span> (¿raíz vs. anidado?). Tajada: <span class="pill pill-fast">rápido</span> con paths ya escritos.</li>
+            <li><strong>AGENTS.md:</strong> “SPA React + Vite. Páginas en <code>src/pages/</code>, HTTP en <code>src/api/</code>. No Next, no Angular.” Comando <code>npm test</code> si el scaffold ya lo tiene.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#r12-vite--react-día-0--una-página--fetch">prompts-base R12</a> (dos chats). Corto:</p>
+          <pre><code>Chat 1 — Día 0. Solo AGENTS.md. React + Vite. No Next, no app/, no Angular.
+Mapa: src/pages/, src/components/, src/api/. HTTP no en el JSX.
+No features de producto. Listá paths y pará.
+
+Chat 2 — Chat NUEVO. Una página [OrderList] que lista el GET [ya existe].
+Cliente en src/api/. Sin login, sin segundo recurso, sin inventar el back.
+DoD: la lista se ve; grep sin LoginPage ni fetch en el JSX. No commit.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El mapa llega antes que el primer <code>fetch</code>.</li>
+                <li>La demo usa el contrato real, no un JSON inventado de 20 campos.</li>
+                <li>El próximo recurso copia esta página, no un tutorial de Next.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>Un solo chat hace MD + dashboard + auth.</li>
+                <li>Sin URL del GET, el agente inventa el DTO.</li>
+                <li>Si pegás A2 (Angular), arma <code>src/app/</code>. Usá R12.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Hay MD con “React + Vite, no Next”. Una página usa <code>src/api/</code> contra el GET nombrado. Cero <code>fetch</code> en el JSX. Cero login. Chat de reglas distinto al de la página.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>app/page.tsx</code> de App Router el primer día, o un mock de pedidos con cifras inventadas.</p></div>
+          <p class="ver-mas">Ver más: <a href="#n1">N1</a> · <a href="#n2">N2</a> · <a href="casos/prompts-base.md#r12-vite--react-día-0--una-página--fetch">R12</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="n-r-2">
+        <summary><h3>NR2 · No mezclar App Router de Next con un Vite SPA</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <h4>Si el disco es Vite, no hay <code>app/</code>, ni <code>'use client'</code>, ni Server Actions.</h4>
+          <p class="lab">Contexto</p>
+          <p>El equipo eligió Vite + React (SPA). Sin una línea en el MD, un modelo capaz crea <code>app/orders/page.tsx</code>, <code>'use client'</code>, <code>next/link</code> o un <code>action</code> de formulario. N3 corta React vs Angular; este caso corta <em>dos Reacts</em>: Vite SPA vs Next App Router. Si el repo fuera Next, el inverso: no armes <code>src/pages/</code> de CRA/Vite.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> si el MD aún no lo dice, este chat solo escribe la línea y para. Feature en chat nuevo (T2). Si el PR ya mezcló, review: no sigas el árbol de Next.</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span> para la línea. Review <span class="pill pill-think">pensar</span> si ya hay <code>app/</code> en un Vite.</li>
+            <li><strong>AGENTS.md:</strong> “SPA React + Vite. No Next. No <code>app/</code>, no Server Components, no <code>'use client'</code>, no <code>next/link</code>. Rutas: React Router en el archivo que el disco ya use.”</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#r13-no-mezclar-next-app-router-con-vite">prompts-base R13</a>. Corto:</p>
+          <pre><code>Este front es Vite + React (SPA). No Next.
+
+Escribí 4–6 líneas en [frontend/AGENTS.md o la raíz]:
+prohibido app/, page.tsx de App Router, 'use client', Server Actions,
+next/link, next/navigation. Rutas: React Router como el disco.
+No instales next. Si ya creaste app/, devolvé el código al mapa Vite.
+No implementes producto en este chat si solo faltaba la línea.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>Una frase corta el hábito de “traer el stack del curso de Next”.</li>
+                <li>El review rechaza un segundo router en el mismo SPA.</li>
+                <li>N3 (Angular) y NR2 (Next) no se pisan: cada uno un mix.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>“React, el que quieras” autoriza Vite + <code>app/</code>.</li>
+                <li>Si el lead cambia a Next, hay que editar el MD y chat nuevo.</li>
+                <li>Un mega-MD de ambos stacks gasta tokens en cada ticket.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>El MD nombra Vite SPA y prohíbe Next. <code>package.json</code> sin <code>next</code>. Ningún <code>app/**/page.tsx</code> ni <code>'use client'</code> en el diff de ese día.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> Vite + carpeta <code>app/</code> “para cuando pasemos a Next”, o un Server Action en un form de SPA.</p></div>
+          <p class="ver-mas">Ver más: <a href="#n3">N3</a> · <a href="casos/prompts-base.md#r13-no-mezclar-next-app-router-con-vite">R13</a> · <a href="casos/react-arquitectura.md">react-arquitectura.md</a>.</p>
+        </article>
+      </details>
+
+      <details class="fold" id="n-r-3">
+        <summary><h3>NR3 · Un test de componente; no inventes una suite Cypress</h3> <span class="fold-hint"></span></summary>
+        <article class="case case-nuevo">
+          <span class="tag tag-nuevo">Nuevo</span>
+          <span class="tag tag-react">React</span>
+          <h4>Un spec al lado del componente. El runner del scaffold. Nada de e2e el día 1.</h4>
+          <p class="lab">Contexto</p>
+          <p>Vite + React fresco. Vitest + Testing Library ya vienen (o el equipo acaba de agregar el runner del scaffold). Primera UI: <code>ContactForm</code> o <code>OrderList</code>. Hay que cubrir un comportamiento (submit, lista vacía). Nadie pidió Cypress, Playwright, ni “cobertura del front”. L5/R5 son el módulo viejo; este caso es greenfield: el agente instala e2e “porque un SPA serio lo tiene”.</p>
+          <p class="lab">Pasos</p>
+          <ol>
+            <li><strong>Chat:</strong> “un spec junto al componente, estilo Vite/RTL. Corré solo ese path.”</li>
+            <li><strong>Modelo:</strong> <span class="pill pill-fast">rápido</span>. <span class="pill pill-think">pensar</span> solo si hay que elegir unit vs. e2e — y igual no instales Cypress de paso.</li>
+            <li><strong>AGENTS.md:</strong> <code>npm test</code> / <code>npx vitest path</code>; “no Cypress/Playwright/Jest si el runner es Vitest”; “un caso del invariante, no una carpeta e2e”.</li>
+          </ol>
+          <p class="lab">Prompt</p>
+          <p>Plantilla completa: <a href="casos/prompts-base.md#r14-un-test-de-componente-sin-cypress">prompts-base R14</a>. Corto:</p>
+          <pre><code>Un test de componente. No una suite e2e.
+
+Componente: [ContactForm / OrderList]. Caso: [submit envía phone /
+lista vacía muestra el vacío].
+Archivo junto al componente, Vitest + Testing Library (el runner del disco).
+Simulá click/change. No Cypress, Playwright, Jest, ni carpeta e2e/.
+Corré solo ese spec. Mostrá comando y salida. No commit.</code></pre>
+          <div class="proscons">
+            <div class="box-ok">
+              <p class="lab lab-ok">Ventajas</p>
+              <ul>
+                <li>El primer spec define el estilo para el resto del front.</li>
+                <li>CI del scaffold alcanza; no hay un segundo pipeline el día 1.</li>
+                <li>El review ve rojo→verde en un archivo.</li>
+              </ul>
+            </div>
+            <div class="box-warn">
+              <p class="lab lab-fail">Desventajas</p>
+              <ul>
+                <li>“Dejalo production-ready” instala Cypress + un workflow de 8 jobs.</li>
+                <li>Pedir 100% genera tests que repiten el JSX.</li>
+                <li>Sin comando en el MD, el agente afirma verde de oídas.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lab">DoD</p>
+          <p>Un spec junto al componente. Comando y salida pegados. <code>package.json</code> sin Cypress/Playwright. Cero carpeta <code>cypress/</code> o <code>e2e/</code> nueva. Sin commit.</p>
+          <div class="box-warn"><p><strong>Fallo típico:</strong> <code>cypress.config.ts</code> + un visit a localhost en el PR del formulario de contacto.</p></div>
+          <p class="ver-mas">Ver más: <a href="#n4">N4</a> · <a href="#l5">L5</a> · <a href="casos/prompts-base.md#r14-un-test-de-componente-sin-cypress">R14</a>.</p>
+        </article>
+      </details>
     </section>
 
     <footer>
-      <p>17 casos (9 legacy + 8 nuevos). Para compartir sin mandar el manual. Nota de envío: <a href="LEEME-PARA-ENVIAR.md">LEEME-PARA-ENVIAR.md</a>. Índice: <a href="guia-inicio.html">guia-inicio.html</a>. Prompts: <a href="casos/prompts-base.md">casos/prompts-base.md</a> (A1–A3, D1–D2). Capítulos largos: <a href="guia-agentes-reglas-y-modelos.html#trabajo-real">#trabajo-real</a>.</p>
+      <p>25 casos (14 legacy + 11 nuevos). Para compartir sin mandar el manual. Nota de envío: <a href="LEEME-PARA-ENVIAR.md">LEEME-PARA-ENVIAR.md</a>. Índice: <a href="guia-inicio.html">guia-inicio.html</a>. Prompts: <a href="casos/prompts-base.md">casos/prompts-base.md</a> (R1–R14, A1–A3, D1–D2). Capítulos largos: <a href="guia-agentes-reglas-y-modelos.html#trabajo-real">#trabajo-real</a>.</p>
       <p>Última redacción: septiembre 2026. No describe un producto de cliente ni un portfolio concreto.</p>
     </footer>
   </div>

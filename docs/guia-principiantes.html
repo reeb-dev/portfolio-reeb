@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Primera vez: agentes de IA en el editor</title>
+  <meta name="description" content="Guía corta para compañeros de cursada: qué es un agente de código, por qué cada chat empieza en blanco y dónde van las reglas del proyecto.">
+  <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --bg: #f1f5f9;
+      --card: #fff;
+      --accent: #1d4ed8;
+      --accent-soft: #eff6ff;
+      --code: #0f172a;
+      --code-bg: #f1f5f9;
+      --use: #1e40af;
+      --react: #075985;
+      --java: #92400e;
+      --model: #5b21b6;
+      --docs: #065f46;
+      --legacy: #9a3412;
+      --nuevo: #0f766e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+      font-size: 17px;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+    header.hero {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    header.hero p.kicker {
+      margin: 0 0 0.5rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 0.75rem; }
+    .lede { color: var(--muted); margin: 0 0 1rem; }
+    .meta { font-size: 0.9rem; color: var(--muted); margin: 0; }
+    .hub {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.35rem 1.5rem 1.55rem;
+      margin-bottom: 1.25rem;
+    }
+    .hub > h2 { font-size: 1.15rem; margin: 0 0 0.9rem; color: var(--muted); font-weight: 600; }
+    .hub-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    @media (min-width: 640px) {
+      .hub-grid { grid-template-columns: 1fr 1fr; }
+    }
+    a.hub-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-left-width: 5px;
+      border-radius: 10px;
+      padding: 0.95rem 1rem 0.9rem;
+    }
+    a.hub-card:hover { box-shadow: 0 0 0 2px var(--accent-soft); }
+    a.hub-card h3 { margin: 0 0 0.35rem; font-size: 1.02rem; }
+    a.hub-card p { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.45; }
+    .hub-start { border-left-color: var(--use); }
+    .hub-legacy { border-left-color: var(--legacy); }
+    .hub-prompts { border-left-color: var(--docs); }
+    .hub-model { border-left-color: var(--model); }
+    code {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.88em;
+      background: var(--code-bg);
+      padding: 0.12em 0.4em;
+      border-radius: 4px;
+      color: var(--code);
+    }
+    a { color: var(--accent); }
+    .puntos-clave {
+      background: var(--ink);
+      color: #f8fafc;
+      border-radius: 16px;
+      padding: 1.35rem 1.5rem 1.45rem;
+      margin-bottom: 1.25rem;
+    }
+    .puntos-clave .kicker-clave {
+      margin: 0 0 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #93c5fd;
+    }
+    .puntos-clave h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.15rem;
+      color: #fff;
+    }
+    .puntos-clave ol {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+    .puntos-clave li {
+      margin-bottom: 0.45rem;
+      color: #e2e8f0;
+    }
+    .puntos-clave li:last-child { margin-bottom: 0; }
+    .puntos-clave a { color: #93c5fd; }
+    .puntos-clave code {
+      background: #1e2937;
+      color: #f8fafc;
+    }
+    article.block {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.35rem 1.5rem 1.45rem;
+      margin-bottom: 1.25rem;
+    }
+    article.block h2 {
+      font-size: 1.15rem;
+      margin: 0 0 0.65rem;
+    }
+    article.block p { margin: 0 0 0.75rem; }
+    article.block p:last-child { margin-bottom: 0; }
+    footer { font-size: 0.85rem; color: var(--muted); margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero" id="inicio">
+      <p class="kicker">Opcional · compañeros de cursada</p>
+      <h1>Si es la primera vez con un agente</h1>
+      <p class="lede">Una página corta. No es trabajo de la materia ni un proceso nuevo del equipo: es material por si te sirve. El índice completo está en el hub.</p>
+      <p class="meta">Septiembre 2026 · Abrilo en el navegador, no como blob de GitHub.</p>
+    </header>
+
+    <aside class="puntos-clave" id="puntos-clave" aria-label="Puntos clave">
+      <p class="kicker-clave">Cinco ideas</p>
+      <h2>Puntos clave</h2>
+      <ol>
+        <li>Cada chat empieza en blanco: el agente no “recuerda” el hilo de ayer.</li>
+        <li>Las reglas van en <code>AGENTS.md</code> o <code>CLAUDE.md</code> de <em>tu</em> proyecto, no en el chat.</li>
+        <li>Si cambiaste ese archivo, abrí un chat nuevo.</li>
+        <li>No pegues el repo entero. Pedí un archivo, una carpeta o un síntoma.</li>
+        <li>Ticket chico: modelo rápido. Diseño o “por qué falla”: modelo que razona.</li>
+      </ol>
+    </aside>
+
+    <article class="block" id="que-es">
+      <h2>Qué es un agente de código</h2>
+      <p>Es un asistente dentro del editor. Puede leer archivos del proyecto, proponer cambios y, si lo permitís, editar o correr comandos. No es un buscador ni el corrector de la cursada: vos pedís una tarea concreta y revisás lo que hace.</p>
+      <p>Usarlo es opcional. No reemplaza al profesor ni al equipo.</p>
+    </article>
+
+    <article class="block" id="chat-en-blanco">
+      <h2>Por qué cada chat empieza en blanco</h2>
+      <p>Cada conversación es un hilo aparte. El agente no trae el chat de ayer salvo que vos se lo pegues. Por eso las reglas que querés <em>siempre</em> (cómo commitear, qué no tocar, el stack) no se escriben en el chat: van en un archivo del repo.</p>
+    </article>
+
+    <article class="block" id="agents-md">
+      <h2>Qué es <code>AGENTS.md</code> / <code>CLAUDE.md</code></h2>
+      <p>Un archivo en la raíz de <strong>tu</strong> proyecto (el de la materia o el del trabajo), no de este kit. Cursor suele leer <code>AGENTS.md</code>; Claude Code, <code>CLAUDE.md</code>. Ahí van reglas cortas del equipo. La herramienta lo carga sola: no lo pegues en el chat.</p>
+      <p>Si editaste ese archivo, el hilo viejo puede seguir con las reglas anteriores. Cerralo y abrí un chat <strong>nuevo</strong>.</p>
+    </article>
+
+    <article class="block" id="no-pegar">
+      <h2>No pegues el repo</h2>
+      <p>Copiar todo el código al chat gasta contexto y no ayuda. Decí el síntoma, el archivo o la carpeta. El agente puede leer el proyecto desde el disco.</p>
+    </article>
+
+    <article class="block" id="modelos">
+      <h2>Modelo rápido vs. modelo que razona</h2>
+      <p>Ticket chico o un typo: modelo rápido. Arquitectura, diseño o “por qué falla esto”: modelo que razona. Los nombres de menú cambian; la lógica no.</p>
+    </article>
+
+    <article class="block" id="abrir-kit">
+      <h2>Cómo abrir este kit</h2>
+      <p>Los HTML se abren en el <strong>navegador</strong> (doble clic o “Open in Browser”). En GitHub, la vista “blob” muestra el código crudo. Los <code>.md</code> en Pages suelen bajarse o verse como texto.</p>
+      <p>Versión publicada: <a href="https://reeb-dev.github.io/reeb-tech/docs/guia-principiantes.html">reeb-dev.github.io/reeb-tech/docs/guia-principiantes.html</a>.</p>
+    </article>
+
+    <section class="hub" id="seguir" aria-label="Seguir leyendo">
+      <h2>Si querés seguir</h2>
+      <div class="hub-grid">
+        <a class="hub-card hub-start" href="guia-inicio.html">
+          <h3>Hub de una pantalla</h3>
+          <p>Índice del kit: capítulos, fichas y atajos.</p>
+        </a>
+        <a class="hub-card hub-legacy" href="casos-practicos-legacy-y-nuevos.html">
+          <h3>Casos prácticos</h3>
+          <p>Fichas: código legacy vs. proyecto nuevo.</p>
+        </a>
+        <a class="hub-card hub-prompts" href="casos/prompts-base.md">
+          <h3>Prompts para pegar</h3>
+          <p>Plantillas para el chat de hoy. En el navegador suele verse como texto.</p>
+        </a>
+        <a class="hub-card hub-model" href="guia-agentes-reglas-y-modelos.html">
+          <h3>Manual largo</h3>
+          <p>Solo si hace falta un capítulo. No hace falta leerlo entero.</p>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <p>Índice: <a href="guia-inicio.html">guia-inicio.html</a> · <a href="README.md">README.md</a>. Última redacción: septiembre 2026.</p>
+    </footer>
+  </div>
+</body>
+</html>
