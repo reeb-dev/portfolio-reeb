@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Primera vez: agentes de IA en el editor</title>
-  <meta name="description" content="Guía corta para compañeros de cursada: qué es un agente de código, por qué cada chat empieza en blanco y dónde van las reglas del proyecto.">
+  <meta name="description" content="Guía de primera vez para compañeros de cursada: qué es un agente, cómo crear AGENTS.md en tu repo, chat nuevo vs. el mismo hilo, y qué no pedir.">
   <style>
     :root {
       --ink: #0f172a;
@@ -23,8 +23,17 @@
       --docs: #065f46;
       --legacy: #9a3412;
       --nuevo: #0f766e;
+      --warn: #9a3412;
+      --warn-bg: #fff7ed;
+      --fast: #9a3412;
+      --fast-bg: #fff7ed;
+      --think: #5b21b6;
+      --think-bg: #f5f3ff;
+      --legacy-bg: #fff7ed;
+      --nuevo-bg: #f0fdfa;
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 1rem; }
     body {
       margin: 0;
       font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -52,6 +61,12 @@
     h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 0.75rem; }
     .lede { color: var(--muted); margin: 0 0 1rem; }
     .meta { font-size: 0.9rem; color: var(--muted); margin: 0; }
+    nav.toc {
+      margin: 1rem 0 0;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    nav.toc a { margin-right: 0.35rem; }
     .hub {
       background: var(--card);
       border: 1px solid var(--line);
@@ -85,6 +100,7 @@
     .hub-legacy { border-left-color: var(--legacy); }
     .hub-prompts { border-left-color: var(--docs); }
     .hub-model { border-left-color: var(--model); }
+    .hub-docs { border-left-color: var(--docs); }
     code {
       font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
       font-size: 0.88em;
@@ -93,6 +109,18 @@
       border-radius: 4px;
       color: var(--code);
     }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--ink);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      margin: 0 0 0.75rem;
+    }
+    pre code { background: none; padding: 0; }
     a { color: var(--accent); }
     .puntos-clave {
       background: var(--ink);
@@ -139,8 +167,102 @@
       font-size: 1.15rem;
       margin: 0 0 0.65rem;
     }
+    article.block h3 {
+      font-size: 1.02rem;
+      margin: 1.1rem 0 0.45rem;
+    }
     article.block p { margin: 0 0 0.75rem; }
-    article.block p:last-child { margin-bottom: 0; }
+    article.block ul, article.block ol { margin: 0 0 0.75rem; padding-left: 1.25rem; }
+    article.block li { margin-bottom: 0.4rem; }
+    article.block p:last-child,
+    article.block ul:last-child,
+    article.block ol:last-child,
+    article.block details:last-child { margin-bottom: 0; }
+    .steps { counter-reset: paso; list-style: none; padding-left: 0; }
+    .steps li {
+      position: relative;
+      padding-left: 2.1rem;
+      margin-bottom: 0.65rem;
+    }
+    .steps li::before {
+      counter-increment: paso;
+      content: counter(paso);
+      position: absolute;
+      left: 0;
+      top: 0.1rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.5rem;
+      text-align: center;
+    }
+    .pair {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin: 0 0 0.75rem;
+    }
+    @media (min-width: 640px) {
+      .pair { grid-template-columns: 1fr 1fr; }
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-left-width: 5px;
+      border-radius: 10px;
+      padding: 0.85rem 1rem 0.9rem;
+      background: var(--bg);
+    }
+    .card h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+    .card p { margin: 0; font-size: 0.92rem; }
+    .card-fast { border-left-color: var(--fast); background: var(--fast-bg); }
+    .card-think { border-left-color: var(--think); background: var(--think-bg); }
+    .card-legacy { border-left-color: var(--legacy); background: var(--legacy-bg); }
+    .card-nuevo { border-left-color: var(--nuevo); background: var(--nuevo-bg); }
+    .dont {
+      margin: 0 0 0.75rem;
+      padding: 0.85rem 1rem 0.95rem;
+      background: var(--warn-bg);
+      border: 1px solid #fed7aa;
+      border-left: 5px solid var(--warn);
+      border-radius: 10px;
+    }
+    .dont h3 { margin: 0 0 0.45rem; font-size: 1.02rem; color: var(--warn); }
+    .dont ul { margin: 0; }
+    details.fold { margin: 0.85rem 0 0; }
+    details.fold > summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 0.2rem 0.35rem 0.25rem;
+      border-radius: 8px;
+      font-weight: 650;
+    }
+    details.fold > summary:hover { background: #f8fafc; }
+    details.fold > summary::-webkit-details-marker { display: none; }
+    details.fold > summary::marker { content: ""; }
+    .fold-hint {
+      display: inline-block;
+      margin-left: 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--muted);
+      vertical-align: middle;
+    }
+    details.fold:not([open]) > summary .fold-hint::after { content: "Abrir"; }
+    details.fold[open] > summary .fold-hint::after { content: "Cerrar"; }
+    .faq dt {
+      font-weight: 700;
+      margin: 0.85rem 0 0.25rem;
+    }
+    .faq dt:first-child { margin-top: 0; }
+    .faq dd { margin: 0 0 0.15rem; }
+    .links { margin: 0; padding-left: 1.25rem; }
+    .links li { margin-bottom: 0.4rem; }
     footer { font-size: 0.85rem; color: var(--muted); margin-top: 1.5rem; }
   </style>
 </head>
@@ -149,19 +271,29 @@
     <header class="hero" id="inicio">
       <p class="kicker">Opcional · compañeros de cursada</p>
       <h1>Si es la primera vez con un agente</h1>
-      <p class="lede">Una página corta. No es trabajo de la materia ni un proceso nuevo del equipo: es material por si te sirve. El índice completo está en el hub.</p>
+      <p class="lede">Página de primera vez: qué es un agente, cómo dejar reglas en <em>tu</em> repo y qué no pedir. No es trabajo de la materia ni un proceso nuevo del equipo. El manual largo sigue en el otro HTML.</p>
       <p class="meta">Septiembre 2026 · Abrilo en el navegador, no como blob de GitHub.</p>
+      <nav class="toc" aria-label="Secciones">
+        <a href="#puntos-clave">Puntos clave</a> ·
+        <a href="#crear-md">Crear el MD</a> ·
+        <a href="#chat-nuevo">Chat nuevo</a> ·
+        <a href="#no-pedir">Qué no pedir</a> ·
+        <a href="#modelos">Modelos</a> ·
+        <a href="#faq">FAQ</a>
+      </nav>
     </header>
 
     <aside class="puntos-clave" id="puntos-clave" aria-label="Puntos clave">
-      <p class="kicker-clave">Cinco ideas</p>
+      <p class="kicker-clave">Siete ideas</p>
       <h2>Puntos clave</h2>
       <ol>
         <li>Cada chat empieza en blanco: el agente no “recuerda” el hilo de ayer.</li>
         <li>Las reglas van en <code>AGENTS.md</code> o <code>CLAUDE.md</code> de <em>tu</em> proyecto, no en el chat.</li>
-        <li>Si cambiaste ese archivo, abrí un chat nuevo.</li>
-        <li>No pegues el repo entero. Pedí un archivo, una carpeta o un síntoma.</li>
+        <li>Si cambiaste ese archivo, abrí un chat nuevo. El hilo viejo puede seguir con las reglas anteriores.</li>
+        <li>No inventes datos, no dorees el ticket, no reescribas la arquitectura, no pegues el repo, no commitees si no te lo pidieron.</li>
         <li>Ticket chico: modelo rápido. Diseño o “por qué falla”: modelo que razona.</li>
+        <li>El MD viaja con Git. Dejalo corto: cada línea entra en cada chat.</li>
+        <li>Legacy: tocá poco. Proyecto nuevo: mapa de carpetas el día 0.</li>
       </ol>
     </aside>
 
@@ -176,26 +308,150 @@
       <p>Cada conversación es un hilo aparte. El agente no trae el chat de ayer salvo que vos se lo pegues. Por eso las reglas que querés <em>siempre</em> (cómo commitear, qué no tocar, el stack) no se escriben en el chat: van en un archivo del repo.</p>
     </article>
 
-    <article class="block" id="agents-md">
-      <h2>Qué es <code>AGENTS.md</code> / <code>CLAUDE.md</code></h2>
-      <p>Un archivo en la raíz de <strong>tu</strong> proyecto (el de la materia o el del trabajo), no de este kit. Cursor suele leer <code>AGENTS.md</code>; Claude Code, <code>CLAUDE.md</code>. Ahí van reglas cortas del equipo. La herramienta lo carga sola: no lo pegues en el chat.</p>
-      <p>Si editaste ese archivo, el hilo viejo puede seguir con las reglas anteriores. Cerralo y abrí un chat <strong>nuevo</strong>.</p>
+    <article class="block" id="crear-md">
+      <h2>Cómo crear <code>AGENTS.md</code> en tu repo</h2>
+      <p>El archivo vive en la raíz de <strong>tu</strong> proyecto (el de la materia o el del trabajo), no en este kit. Cursor suele leer <code>AGENTS.md</code>; Claude Code, <code>CLAUDE.md</code>. La herramienta lo carga sola: no lo pegues en el chat.</p>
+      <ol class="steps">
+        <li>Abrí la raíz del repo en el que vas a trabajar (no esta carpeta <code>docs/</code>).</li>
+        <li>Creá <code>AGENTS.md</code> (Cursor y la mayoría). Si usás Claude Code, creá <code>CLAUDE.md</code> o un <code>CLAUDE.md</code> de una línea que importe <code>@AGENTS.md</code>.</li>
+        <li>Escribí 10–15 líneas: stack, carpetas, qué no hacer, tests, y “no commit si no se pide”.</li>
+        <li>Guardá. Abrí un <strong>chat nuevo</strong> para el primer ticket. El hilo anterior no relee el disco solo.</li>
+      </ol>
+      <h3>Ejemplo (React + Vite, 12 líneas)</h3>
+      <pre><code># AGENTS.md
+
+- Stack: React + Vite. Rutas en `src/pages/`, UI en `src/components/`, HTTP en `src/api/`.
+- El componente no llama `fetch` ni `axios`. Usa el cliente de `src/api/`.
+- No inventes endpoints, pantallas de login ni datos de negocio que el ticket no nombre.
+- Ticket acotado: tocá solo los archivos nombrados.
+- Sin store nuevo (Redux / Zustand) si nadie lo pidió.
+- Tests: `npm test`. Si hay spec del síntoma, extendelo; no armes Cypress de paso.
+- No commit ni push salvo que lo pida el chat.</code></pre>
+      <details class="fold" id="ejemplo-java">
+        <summary>Misma idea en Java / Spring <span class="fold-hint"></span></summary>
+        <pre><code># AGENTS.md
+
+- Stack: Spring Boot, un deploy. Controller → service → repository.
+- El controller no tiene SQL ni EntityManager. JSON = DTO, no entidad JPA.
+- No inventes tablas, endpoints ni módulos Maven que el ticket no nombre.
+- Un GET o POST nuevo copia el vecino del mismo paquete.
+- Sin hexagonal ni microservicio de paso.
+- Tests: `./mvnw test`. JUnit del patrón del módulo.
+- No commit ni push salvo que lo pida el chat.</code></pre>
+        <p>Si el repo es mixto (front + API), la raíz nombra quién habla con quién; el detalle de React o de JPA va en un MD anidado. Ficha: <a href="casos/portable-agents.md">portable-agents.md</a>.</p>
+      </details>
     </article>
 
-    <article class="block" id="no-pegar">
-      <h2>No pegues el repo</h2>
-      <p>Copiar todo el código al chat gasta contexto y no ayuda. Decí el síntoma, el archivo o la carpeta. El agente puede leer el proyecto desde el disco.</p>
+    <article class="block" id="chat-nuevo">
+      <h2>Chat nuevo o el mismo hilo</h2>
+      <p>El MD se inyecta al <strong>abrir</strong> la sesión. Editar el archivo a mitad de conversación no actualiza ese hilo solo.</p>
+      <div class="pair">
+        <div class="card card-nuevo">
+          <h3>Chat nuevo</h3>
+          <p>Carga el MD actual del disco. Usalo después de editar reglas, si el hilo está inflado, o para un ticket distinto.</p>
+        </div>
+        <div class="card card-legacy">
+          <h3>Mismo chat</h3>
+          <p>Sigue con lo que ya inyectó (y con el historial). Útil para el mismo síntoma. No sirve para “probar” un MD recién cambiado.</p>
+        </div>
+      </div>
+      <details class="fold" id="detalle-inyeccion">
+        <summary>Qué dice la documentación de producto <span class="fold-hint"></span></summary>
+        <p>Claude Code lee <code>CLAUDE.md</code> al inicio. No lo relee en cada turno. Un cambio entra en la próxima sesión, o en la actual con <code>/compact</code> o <code>/memory</code>. Cursor combina <code>AGENTS.md</code> y reglas <code>.mdc</code>; no dupliques el mismo texto en ambos. Pedirle al agente que <em>lea</em> el path es un parche, no la inyección automática.</p>
+        <p>Fuentes: <a href="https://code.claude.com/docs/en/claude-md">CLAUDE.md (Anthropic)</a> · <a href="https://support.claude.com/en/articles/14553240-give-claude-context-claude-md-and-better-prompts">Give Claude context</a> · <a href="https://cursor.com/docs/rules">Cursor Rules</a>.</p>
+      </details>
+    </article>
+
+    <article class="block" id="no-pedir">
+      <h2>Qué no pedir</h2>
+      <div class="dont">
+        <h3>Lista de no</h3>
+        <ul>
+          <li><strong>Inventar datos.</strong> Endpoints, tablas, roles, métricas o pantallas que el ticket no nombra.</li>
+          <li><strong>Dorar el ticket.</strong> Login, admin, store o “mejora” de media app cuando pediste un síntoma.</li>
+          <li><strong>Reescribir la arquitectura.</strong> Hexagonal, microservicios o Next en un repo Vite, si nadie lo pidió.</li>
+          <li><strong>Pegar el repo entero.</strong> Decí el síntoma, el archivo o la carpeta. El agente lee el disco.</li>
+          <li><strong>Commit o push sin que lo pidan.</strong> Revisá el diff. El commit lo pedís vos.</li>
+        </ul>
+      </div>
     </article>
 
     <article class="block" id="modelos">
-      <h2>Modelo rápido vs. modelo que razona</h2>
-      <p>Ticket chico o un typo: modelo rápido. Arquitectura, diseño o “por qué falla esto”: modelo que razona. Los nombres de menú cambian; la lógica no.</p>
+      <h2>Modelo rápido y modelo que razona</h2>
+      <p>Los nombres de menú cambian; la lógica no. Ticket chico o un typo: modelo rápido. Arquitectura, diseño o “por qué falla esto”: modelo que razona.</p>
+      <div class="pair">
+        <div class="card card-fast">
+          <h3>Rápido — ticket A</h3>
+          <p>Al filtrar el listado de pedidos, la página no vuelve a 1. Archivos: <code>OrderFilter.tsx</code>, <code>OrderList.tsx</code>. Mismos componentes, mismo cliente HTTP.</p>
+        </div>
+        <div class="card card-think">
+          <h3>Pensar — ticket B</h3>
+          <p>El listado y el detalle no comparten el estado del envío. Hay que decidir un solo lugar, sin meter un store que el repo no tiene.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="block" id="git">
+      <h2>Git: el archivo viaja con el proyecto</h2>
+      <p>El MD está en el repo. Quien clone tiene las mismas reglas. No vive en tu cuenta del editor ni en un chat. Un PR de reglas viaja con el código.</p>
+    </article>
+
+    <article class="block" id="legacy-nuevo">
+      <h2>Código que ya está vs. proyecto nuevo</h2>
+      <div class="pair">
+        <div class="card card-legacy">
+          <h3>Legacy</h3>
+          <p>El GET de envíos ya existe. El ticket pide eventos del envío. Mismo paquete, mismas capas. No un <code>events-service</code>.</p>
+        </div>
+        <div class="card card-nuevo">
+          <h3>Proyecto nuevo</h3>
+          <p>Scaffold fresco (Vite + Spring o el par del equipo). Primero el mapa de carpetas en el MD. La primera pantalla es <em>otro</em> chat.</p>
+        </div>
+      </div>
+      <p>Fichas para enviar: <a href="casos-practicos-legacy-y-nuevos.html">casos-practicos-legacy-y-nuevos.html</a>.</p>
+    </article>
+
+    <article class="block" id="tokens">
+      <h2>Tokens: el MD corto se cumple</h2>
+      <p>Cada línea del archivo entra en cada chat. Quince líneas del mapa se leen y se respetan. Un tratado de 400 se paga en tokens y el medio se ignora. No dupliques las mismas reglas en <code>AGENTS.md</code> y en <code>.cursor/rules</code>.</p>
+      <details class="fold" id="detalle-tokens">
+        <summary>Techos que publica cada producto <span class="fold-hint"></span></summary>
+        <p>Anthropic recomienda <code>CLAUDE.md</code> corto (~200 líneas): más texto reduce el cumplimiento. Cursor: reglas de proyecto por debajo de ~500 líneas. Un archivo enorme no es un candado de seguridad: secretos y prod se cubren con permisos, hooks y CI.</p>
+        <p>Capítulo: <a href="guia-agentes-reglas-y-modelos.html#cuidar-tokens">#cuidar-tokens</a>.</p>
+      </details>
+    </article>
+
+    <article class="block" id="faq">
+      <h2>Preguntas frecuentes</h2>
+      <dl class="faq">
+        <dt>¿Es obligatorio para la materia?</dt>
+        <dd>No. Es material opcional. No reemplaza al profesor, a la consigna ni al equipo.</dd>
+        <dt>¿Dónde creo el archivo?</dt>
+        <dd>En la raíz de <em>tu</em> repo. Este kit no es el producto: no copies estas páginas como si fueran las reglas del trabajo práctico.</dd>
+        <dt>Editó el MD y el chat sigue igual. ¿Qué hago?</dt>
+        <dd>Abrí un chat nuevo. El hilo actual no relee el disco solo.</dd>
+        <dt>¿Qué modelo elijo?</dt>
+        <dd>Síntoma acotado, archivos nombrados: rápido. Decidir capas o “por qué falla”: el que razona. Los nombres del menú caducan.</dd>
+        <dt>¿Hace falta commitear el MD?</dt>
+        <dd>Si el equipo lo va a usar, sí: viaja con Git. El agente no commitea salvo que se lo pidas.</dd>
+      </dl>
     </article>
 
     <article class="block" id="abrir-kit">
       <h2>Cómo abrir este kit</h2>
       <p>Los HTML se abren en el <strong>navegador</strong> (doble clic o “Open in Browser”). En GitHub, la vista “blob” muestra el código crudo. Los <code>.md</code> en Pages suelen bajarse o verse como texto.</p>
       <p>Versión publicada: <a href="https://reeb-dev.github.io/reeb-tech/docs/guia-principiantes.html">reeb-dev.github.io/reeb-tech/docs/guia-principiantes.html</a>.</p>
+    </article>
+
+    <article class="block" id="enlaces">
+      <h2>Enlaces</h2>
+      <ul class="links">
+        <li>Hub: <a href="guia-inicio.html">guia-inicio.html</a></li>
+        <li>Casos prácticos: <a href="casos-practicos-legacy-y-nuevos.html">casos-practicos-legacy-y-nuevos.html</a></li>
+        <li>Prompts para pegar: <a href="casos/prompts-base.md">casos/prompts-base.md</a></li>
+        <li>Anthropic, <code>CLAUDE.md</code>: <a href="https://code.claude.com/docs/en/claude-md">code.claude.com/docs/en/claude-md</a></li>
+        <li>Cursor Rules: <a href="https://cursor.com/docs/rules">cursor.com/docs/rules</a></li>
+      </ul>
     </article>
 
     <section class="hub" id="seguir" aria-label="Seguir leyendo">

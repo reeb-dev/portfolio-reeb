@@ -24,7 +24,7 @@ Los `.md` en Pages suelen bajarse o verse como texto crudo. Usá los HTML.
 ## Cómo usar
 
 1. Hub de una pantalla: [guia-inicio.html](guia-inicio.html).
-2. Si es la primera vez: [guia-principiantes.html](guia-principiantes.html). Una página, opcional.
+2. Si es la primera vez: [guia-principiantes.html](guia-principiantes.html). Página de primera vez (pasos y FAQ), opcional.
 3. Un capítulo del manual si hace falta: [guia-agentes-reglas-y-modelos.html](guia-agentes-reglas-y-modelos.html). No hace falta leerlo entero.
 4. Prompts para el chat de hoy: [casos/prompts-base.md](casos/prompts-base.md).
 
@@ -46,7 +46,7 @@ Abrilos en el **navegador** (doble clic, o “Open in Browser”). GitHub “blo
 | --- | --- |
 | [README.md](README.md) | Este índice. Quien abre `docs/`. |
 | [guia-inicio.html](guia-inicio.html) | Hub de una pantalla. Empezá acá en el navegador. |
-| [guia-principiantes.html](guia-principiantes.html) | Primera vez: qué es un agente y dónde van las reglas. Opcional. |
+| [guia-principiantes.html](guia-principiantes.html) | Primera vez: agente, AGENTS.md, chat nuevo, qué no pedir. Opcional. |
 | [guia-agentes-reglas-y-modelos.html](guia-agentes-reglas-y-modelos.html) | Manual largo (“ver más”). |
 | [casos-practicos-legacy-y-nuevos.html](casos-practicos-legacy-y-nuevos.html) | Fichas: código legacy vs. proyecto nuevo. |
 | [casos/](casos/README.md) | Casos cortos. Índice de fichas Markdown. |
